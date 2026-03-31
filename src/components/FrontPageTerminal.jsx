@@ -19,6 +19,7 @@ export default function FrontPageTerminal() {
   return (
     <div className="text-3xl font-bold tracking-wider leading-10 p-3 text-[#00FF41] font-['Courier Prime'] bg-black h-screen">
       <span ref={el} />
+      <div className="overlay bg-[url('../assets/overlay.webp')] w-full h-full absolute left-0 top-0 opacity-80 z-10 bg-contain mix-blend-darken"></div>
     </div>
   );
 }
