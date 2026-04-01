@@ -41,20 +41,34 @@ export default function Newspaper() {
         height={window.innerHeight * 0.8}
       >
         <Page className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover">
-          <singlePage className="demoPage" />
-          Page 1
+          {/* <singlePage className="demoPage" /> */}
         </Page>
         <Page className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover">
-          <singlePage className="demoPage" />
-          Page 2
+          {/* <singlePage className="demoPage" /> */}
         </Page>
         <Page className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover">
-          <singlePage className="demoPage" />
-          Page 3
+          {/* <singlePage className="demoPage" /> */}
         </Page>
         <Page className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover">
-          <singlePage className="demoPage" />
-          Page 4
+          {/* <singlePage className="demoPage" /> */}
+        </Page>
+        <Page className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover">
+          {/* <singlePage className="demoPage" /> */}
+        </Page>
+        <Page className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover">
+          {/* <singlePage className="demoPage" /> */}
+        </Page>
+        <Page className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover">
+          {/* <singlePage className="demoPage" /> */}
+        </Page>
+        <Page className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover">
+          {/* <singlePage className="demoPage" /> */}
+        </Page>
+        <Page className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover">
+          {/* <singlePage className="demoPage" /> */}
+        </Page>
+        <Page className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover">
+          {/* <singlePage className="demoPage" /> */}
         </Page>
       </HTMLFlipBook>
     );
