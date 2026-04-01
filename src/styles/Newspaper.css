@@ -5,25 +5,23 @@
 .newsContent {
   font-family: "Noticia Text";
 }
+
 .vignette {
-  box-shadow: 0 0 10em 4em #000000 inset;
-    /* animation: shakeLight 2s infinite alternate; */
-    overflow: hidden;
+  box-shadow: 0 0 12em 7em #000000 inset;
+  scale:1.1;
+    animation: shakeLight 2s infinite alternate;
 }
 @keyframes shakeLight {
   0% {
-    transform: translate(-1em,1em);
+    transform: translate(-2em,2em);
   }
-  25% {
-    transform:translate(1em,1em);
+  33% {
+    transform:translate(2em,2em);
 }
-50% {
-      transform:translate(1em,-1em);
-    }
-    75% {
-      transform:translate(-1em,-1em);
+66% {
+      transform:translate(2em,-2em);
     }
     100% {
-      transform:translate(-1em,1em);
+      transform:translate(-2em,-2em);
   }
 }

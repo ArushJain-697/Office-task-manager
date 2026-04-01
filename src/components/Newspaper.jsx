@@ -2,37 +2,36 @@ import "../styles/Newspaper.css";
 import React from "react";
 import HTMLFlipBook from "react-pageflip";
 export default function Newspaper() {
-
   const Page = React.forwardRef((props, ref) => {
     return (
-        <div className="demoPage bg-contain  z-3 " ref={ref}>
-            {/* <h1>Page Header</h1>
+      <div className="demoPage bg-contain  z-3 " ref={ref}>
+        {/* <h1>Page Header</h1>
             <p>{props.children}</p>
             <p>Page number: {props.number}</p> */}
-            <SinglePage />
-        </div>
+        <SinglePage />
+      </div>
     );
-});
-// function MyBook(props) {
-//     return (
-//         <HTMLFlipBook width={300} height={500}>
-//             <Page number="1">Page text</Page>
-//             <Page number="2">Page text</Page>
-//             <Page number="3">Page text</Page>
-//             <Page number="4">Page text</Page>
-//         </HTMLFlipBook>
-//     );
-// }
-// function MyBook(props) {
-//     return (
-//         <HTMLFlipBook width={300} height={500}>
-//             <Page number="1">Page text</Page>
-//             <Page number="2">Page text</Page>
-//             <Page number="3">Page text</Page>
-//             <Page number="4">Page text</Page>
-//         </HTMLFlipBook>
-//     );
-// }
+  });
+  // function MyBook(props) {
+  //     return (
+  //         <HTMLFlipBook width={300} height={500}>
+  //             <Page number="1">Page text</Page>
+  //             <Page number="2">Page text</Page>
+  //             <Page number="3">Page text</Page>
+  //             <Page number="4">Page text</Page>
+  //         </HTMLFlipBook>
+  //     );
+  // }
+  // function MyBook(props) {
+  //     return (
+  //         <HTMLFlipBook width={300} height={500}>
+  //             <Page number="1">Page text</Page>
+  //             <Page number="2">Page text</Page>
+  //             <Page number="3">Page text</Page>
+  //             <Page number="4">Page text</Page>
+  //         </HTMLFlipBook>
+  //     );
+  // }
 
   function MyBook(props) {
     return (
@@ -77,17 +76,14 @@ export default function Newspaper() {
 
   return (
     <>
-      <div className="bgTable bg-[url('/assets/table.png')] w-screen h-screen flex justify-center items-center bg-cover overflow-hidden">
+      <div className="bgTable bg-[url('/assets/table.png')] fixed inset-0 flex justify-center items-center bg-cover overflow-hidden">
         <MyBook />
-        {/* <div className="main bg-[url('/assets/Newspaper.png')] w-[80vw] bg-black h-[80vh] bg-contain repeat">
-          5
-          <h1 className="newspaperTitle text-7xl font-[cursive] text-center  text-gray-800">
-            Linked Out
-          </h1>
-          <MyBook/>
-        </div> */}
-        <img src="/assets/wanted.jpeg" alt="wanted image" className="absolute right-30 top-10 rotate-45 max-w-30 p-1 hover:border-2 border-amber-300 hover:scale-110s box-content select-none " />
-      <div className="vignette z-10 absolute w-full h-full bg-transparent pointer-events-none"></div>
+        <img
+          src="/assets/wanted.jpeg"
+          alt="wanted image"
+          className="absolute right-30 top-10 rotate-45 max-w-30 p-1 hover:border-2 border-amber-300 hover:scale-110s box-content select-none "
+        />
+        <div className="vignette z-10 absolute w-full h-full bg-transparent pointer-events-none"></div>
       </div>
     </>
   );
@@ -95,55 +91,53 @@ export default function Newspaper() {
 function SinglePage() {
   return (
     <>
-        {/* <MyBook  /> */}
-        {/* <div className="main bg-[url('/assets/Newspaper.png')] w-[80vw] bg-black h-[80vh] bg-contain repeat">
+      {/* <MyBook  /> */}
+      {/* <div className="main bg-[url('/assets/Newspaper.png')] w-[80vw] bg-black h-[80vh] bg-contain repeat">
           5
           <h1 className="newspaperTitle text-7xl font-[cursive] text-center  text-gray-800">
             Linked Out
           </h1>
           <MyBook/>
         </div> */}
-        <div className="page p-3 bg-[url('/assets/Newspaper.png')] grayscale bg-cover h-[80vh] w-[30vw]">
-          <div className="newsHeader h-[5%] p-0 m-0 border"></div>
-          <div className="newsContent flex gap-6 mt-2">
-            <div className="col1 ">
-              <h2 className="newsHeading text-2xl text-center">Falana 1</h2>
-              <img
-                src="/assets/test.png"
-                className="newsImage max-w-[55%] float-left mr-4 "
-              />
-              <p className="newsContent text-justify">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
-                numquam quaerat ipsa commodi earum optio quia ut, quis
-                distinctio pariatur cumque amet vitae dolore non nobis. Atque
-                numquam nihil facere vitae quis aliquid incidunt quia, voluptas
-                sequi. Nam, at maiores! Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Itaque blanditiis omnis doloribus quidem.
-                Fugiat obcaecati veritatis ea nihil! Eveniet similique inventore
-                at, tempora numquam delectus quidem pariatur recusandae odio
-                rem?
-              </p>
-            </div>
-            <div className="col2 ">
-              <h2 className="newsHeading text-2xl text-center">Falana 2</h2>
-              <img
-                src={"/assets/test.png"}
-                className="newsImage max-w-[55%] float-left mr-4"
-              />
-              <p className="newsContent text-justify">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
-                numquam quaerat ipsa commodi earum optio quia ut, quis
-                distinctio pariatur cumque amet vitae dolore non nobis. Atque
-                numquam nihil facere vitae quis aliquid incidunt quia, voluptas
-                sequi. Nam, at maiores! Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Itaque blanditiis omnis doloribus quidem.
-                Fugiat obcaecati veritatis ea nihil! Eveniet similique inventore
-                at, tempora numquam delectus quidem pariatur recusandae odio
-                rem?
-              </p>
-            </div>
+      <div className="page p-3 bg-[url('/assets/Newspaper.png')] grayscale bg-cover h-[80vh] w-[30vw]">
+        <div className="newsHeader h-[5%] p-0 m-0 border"></div>
+        <div className="newsContent flex gap-6 mt-2">
+          <div className="col1 ">
+            <h2 className="newsHeading text-2xl text-center">Falana 1</h2>
+            <img
+              src="/assets/test.png"
+              className="newsImage max-w-[55%] float-left mr-4 "
+            />
+            <p className="newsContent text-justify">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
+              numquam quaerat ipsa commodi earum optio quia ut, quis distinctio
+              pariatur cumque amet vitae dolore non nobis. Atque numquam nihil
+              facere vitae quis aliquid incidunt quia, voluptas sequi. Nam, at
+              maiores! Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Itaque blanditiis omnis doloribus quidem. Fugiat obcaecati
+              veritatis ea nihil! Eveniet similique inventore at, tempora
+              numquam delectus quidem pariatur recusandae odio rem?
+            </p>
+          </div>
+          <div className="col2 ">
+            <h2 className="newsHeading text-2xl text-center">Falana 2</h2>
+            <img
+              src={"/assets/test.png"}
+              className="newsImage max-w-[55%] float-left mr-4"
+            />
+            <p className="newsContent text-justify">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
+              numquam quaerat ipsa commodi earum optio quia ut, quis distinctio
+              pariatur cumque amet vitae dolore non nobis. Atque numquam nihil
+              facere vitae quis aliquid incidunt quia, voluptas sequi. Nam, at
+              maiores! Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Itaque blanditiis omnis doloribus quidem. Fugiat obcaecati
+              veritatis ea nihil! Eveniet similique inventore at, tempora
+              numquam delectus quidem pariatur recusandae odio rem?
+            </p>
           </div>
         </div>
+      </div>
     </>
   );
 }
