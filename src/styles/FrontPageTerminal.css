@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import "tailwindcss";
-*{
-    font-family: 'Source Code Pro';
+.terminalParent{
+  font-family: 'Source Code Pro';
   text-transform: uppercase;
   font-weight: 500;
 }

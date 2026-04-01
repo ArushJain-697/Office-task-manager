@@ -115,7 +115,7 @@ const handleKeyDown = (e) => {
   return (
     <div
       onClick={() => textAreaRef.current?.focus()}
-      className="relative text-2xl font-bold tracking-wider leading-10 p-6 text-[#00FF41] font-mono bg-black h-screen overflow-hidden"
+      className="terminalParent relative text-2xl font-bold tracking-wider leading-10 p-6 text-[#00FF41] font-mono bg-black h-screen overflow-hidden"
     >
       <div className="terminal-content">
         {terminalHistory.map((line, i) => (
