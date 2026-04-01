@@ -27,7 +27,7 @@ export default function FrontPageTerminal() {
       <div className="terminalText">
       <span ref={el} />
       </div>
-      <div className="overlay bg-[url('../assets/overlay.webp')] w-full h-full absolute left-0 top-0 opacity-80 z-10 bg-contain mix-blend-darken pointer-events-none" ></div>
+      <div className="overlay w-full h-full absolute left-0 top-0 opacity-80 z-10 bg-contain mix-blend-darken pointer-events-none" ></div>
       <textarea name="terminalInput" id="terminalInput" className='border-none outline-0 w-full h-full resize-none '></textarea>
     </div>
   );

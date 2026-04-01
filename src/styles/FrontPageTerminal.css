@@ -1,18 +1,18 @@
 @import url("https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import "tailwindcss";
-.overlay {
+/* .overlay {
   background-size: 60%;
   animation: overlayAnim 8s infinite linear;
-}
-@keyframes overlayAnim {
+} */
+/* @keyframes overlayAnim {
   from {
     background-position-y: 0%;
   }
   to {
     background-position-y: 100%;
   }
-}
-.terminalText,#terminalInput{
+} */
+/* .terminalText,#terminalInput{
     animation: shake 0.1s infinite linear;
 }
     @keyframes shake {
@@ -38,4 +38,4 @@
       100% {
         transform: translate(0px,0px);
       }
-    }
+    } */
