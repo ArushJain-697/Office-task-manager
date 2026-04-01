@@ -40,7 +40,7 @@ export default function FrontPageTerminal() {
   useEffect(() => {
     startTypedAnimation([
       "Welcome to the underworld linkedin ! 😈 ^1000 <br/> Are you a new user or a returning goon?<br/> ^500",
-      "Type :  Login/Sign Up : ",
+      "> Type :  Login/Sign Up : ",
     ]);
 
     // Cleanup on component unmount
@@ -60,15 +60,15 @@ const handleKeyDown = (e) => {
     
     if (currentStep === "COMMAND") {
       if (input.toLowerCase() === "login") {
-        setTerminalHistory(prev => [...prev, `Type : Login/Sign Up : ${input}`]);
+        setTerminalHistory(prev => [...prev, `>Type : Login/Sign Up : ${input}`]);
         setUserInput("");
         setCurrentStep("ID");
-        startTypedAnimation(['<br/>ACCESSING DATABASE... ^500 <br/>ENTER GOON ID: ']);
+        startTypedAnimation(['<br/>>ACCESSING DATABASE... ^500 <br/>> ENTER GOON ID: ']);
       } else if(input.toLowerCase()==="sign up"){
         setTerminalHistory(prev => [...prev, `Type : Login/Sign Up : ${input}`]);
         setUserInput("");
         setCurrentStep("ID_signup");
-        startTypedAnimation(['<br/>WELCOME !... ^500 <br/>ENTER GOON ID: ']);
+        startTypedAnimation(['<br/>WELCOME !... ^500 <br/>> ENTER GOON ID: ']);
       }else {
         startTypedAnimation(['<br/>INVALID COMMAND. ^300 <br/>Type "Login" or "Sign Up": ']);
         setUserInput("");
@@ -77,16 +77,16 @@ const handleKeyDown = (e) => {
     
     else if (currentStep === "ID") {
       // Save ID and move to Password
-      setTerminalHistory(prev => [...prev, `ENTER GOON ID: ${input}`]);
+      setTerminalHistory(prev => [...prev, `> ENTER GOON ID: ${input}`]);
       setLoginData(prev => ({ ...prev, id: input }));
       setUserInput("");
       setCurrentStep("PASS");
-      startTypedAnimation(['<br/>ENCRYPTING CHANNEL... ^500 <br/>ENTER PASSWORD: ']);
+      startTypedAnimation(['<br/>ENCRYPTING CHANNEL... ^500 <br/>> ENTER PASSWORD: ']);
     } 
     
     else if (currentStep === "PASS") {
       // Final Step: Password entered
-      setTerminalHistory(prev => [...prev, `ENTER PASSWORD: ********`]);
+      setTerminalHistory(prev => [...prev, `> ENTER PASSWORD: ********`]);
       setLoginData(prev => ({ ...prev, pass: input }));
       setUserInput("");
       
@@ -94,15 +94,15 @@ const handleKeyDown = (e) => {
       startTypedAnimation(['<br/>VERIFYING... ^1000 <br/>ACCESS GRANTED. Welcome, ' + loginData.id]);
     }
     else if (currentStep === "ID_signup") {
-      setTerminalHistory(prev => [...prev, `ENTER GOON ID: ${input}`]);
+      setTerminalHistory(prev => [...prev, `> ENTER GOON ID: ${input}`]);
       setLoginData(prev => ({ ...prev, id: input }));
       setUserInput("");
       setCurrentStep("PASS_signup");
-      startTypedAnimation(['<br/>ENCRYPTING CHANNEL... ^500 <br/>ENTER PASSWORD: ']);
+      startTypedAnimation(['<br/>ENCRYPTING CHANNEL... ^500 <br/>> ENTER PASSWORD: ']);
     }
     else if (currentStep === "PASS_signup") {
       // Final Step: Password entered
-      setTerminalHistory(prev => [...prev, `ENTER PASSWORD: ********`]);
+      setTerminalHistory(prev => [...prev, `> ENTER PASSWORD: ********`]);
       setLoginData(prev => ({ ...prev, pass: input }));
       setUserInput("");
       

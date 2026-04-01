@@ -1,6 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import "tailwindcss";
-
+*{
+    font-family: 'Source Code Pro';
+  text-transform: uppercase;
+}
 .terminal-cursor {
   display: inline-block;
   width: 10px;
@@ -34,6 +37,7 @@
 .terminalText {
   text-shadow: 0 0 5px #00FF41;
   animation: flicker 0.15s infinite;
+
 }
 
 @keyframes flicker {
