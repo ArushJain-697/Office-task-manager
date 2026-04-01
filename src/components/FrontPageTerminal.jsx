@@ -39,7 +39,7 @@ export default function FrontPageTerminal() {
   // Initial Boot
   useEffect(() => {
     startTypedAnimation([
-      "Welcome to the underworld linkedin ! 😈 ^1000 <br/> Are you a new user or a returning goon?<br/> ^500",
+      "Welcome to the underworld linkedin !  ^1000 <br/> Are you a new user or a returning goon?<br/> ^500",
       "> Type :  Login/Sign Up : ",
     ]);
 
