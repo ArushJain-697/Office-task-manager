@@ -39,6 +39,7 @@ export default function Newspaper() {
       <HTMLFlipBook
         width={window.innerWidth * 0.3}
         height={window.innerHeight * 0.8}
+        drawShadow={false}
       >
         <Page className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover">
           {/* <singlePage className="demoPage" /> */}
