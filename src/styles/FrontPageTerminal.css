@@ -3,6 +3,7 @@
 *{
     font-family: 'Source Code Pro';
   text-transform: uppercase;
+  font-weight: 500;
 }
 .terminal-cursor {
   display: inline-block;

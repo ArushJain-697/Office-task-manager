@@ -70,7 +70,7 @@ const handleKeyDown = (e) => {
         setCurrentStep("ID_signup");
         startTypedAnimation(['<br/>WELCOME !... ^500 <br/>> ENTER GOON ID: ']);
       }else {
-        startTypedAnimation(['<br/>INVALID COMMAND. ^300 <br/>Type "Login" or "Sign Up": ']);
+        startTypedAnimation(['<br/>INVALID COMMAND. ^300 <br/>>Type "Login" or "Sign Up": ']);
         setUserInput("");
       }
     } 
