@@ -4,7 +4,7 @@ import FrontPageTerminal from "./components/FrontPageTerminal";
 import Newspaper from "./components/Newspaper";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <FrontPageTerminal /> 
-    {/* <Newspaper /> */}
+    {/* <FrontPageTerminal />  */}
+    <Newspaper />
   </StrictMode>,
 );
