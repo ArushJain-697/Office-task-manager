@@ -1,41 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import "tailwindcss";
-/* .overlay {
-  background-size: 60%;
-  animation: overlayAnim 8s infinite linear;
-} */
-/* @keyframes overlayAnim {
-  from {
-    background-position-y: 0%;
-  }
-  to {
-    background-position-y: 100%;
-  }
-} */
-/* .terminalText,#terminalInput{
-    animation: shake 0.1s infinite linear;
+
+.terminal-cursor {
+  display: inline-block;
+  width: 10px;
+  height: 1.2em;
+  background: #00FF41;
+  margin-left: 4px;
+  animation: blink 0.8s infinite;
+  vertical-align: middle;
 }
-    @keyframes shake {
-      0% {
-        transform: translate(0px,0px);
-        opacity:100%;
-      }
-      10%{
-        opacity:70%;
-      }
-      25% {
-        transform: translate(1px,1px);
-      }
-      35%{
-        transform: translateY(1px);
-      }
-      50% {
-        transform: translate(-2px,-2px);
-      }
-      75% {
-        transform: translate(1px,1px);
-      }
-      100% {
-        transform: translate(0px,0px);
-      }
-    } */
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
