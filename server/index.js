@@ -4,17 +4,46 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware
-app.use(cors()); // Allows your React frontend to talk to this backend
-app.use(express.json()); // Allows your server to accept JSON data
+app.use(cors()); 
+app.use(express.json()); 
 
-// A basic test route
+// Your basic test route
 app.get('/api', (req, res) => {
   res.json({ message: "Hello from the backend!" });
 });
 
-// CRUCIAL FOR RAILWAY: Use process.env.PORT
-const PORT = process.env.PORT || 5000;
+// --- FAKE DATABASE ---
+// This array will hold the data temporarily while the server runs
+const users = [];
+
+// --- ENDPOINT TO STORE DATA ---
+app.post('/api/register', (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  // Just save exactly what the frontend sends
+  const newUser = { 
+    id: users.length + 1, 
+    username: username, 
+    password: password 
+  };
+  
+  users.push(newUser);
+
+  // Send success response back to frontend
+  res.status(201).json({ 
+    message: "Data received and stored!", 
+    user: newUser 
+  });
+});
+
+// --- ENDPOINT TO VIEW DATA ---
+// The frontend guy can hit this to prove the data actually saved
+app.get('/api/users', (req, res) => {
+  res.json(users);
+});
+
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
