@@ -4,7 +4,7 @@ import HTMLFlipBook from "react-pageflip";
 export default function Newspaper() {
   const Page = React.forwardRef((props, ref) => {
     return (
-      <div className="demoPage bg-contain  z-3 " ref={ref}>
+      <div className="demoPage bg-contain select-none z-3 " ref={ref}>
         {/* <h1>Page Header</h1>
             <p>{props.children}</p>
             <p>Page number: {props.number}</p> */}
@@ -80,8 +80,8 @@ export default function Newspaper() {
         <MyBook />
         <img
           src="/assets/wanted.jpeg"
-          alt="wanted image"
-          className="absolute right-30 top-10 rotate-45 max-w-30 p-1 hover:border-2 border-amber-300 hover:scale-110s box-content select-none "
+          alt="wanted image" draggable={false}
+          className="absolute right-30 top-10 rotate-45 max-w-30 p-1 hover:border-2 border-amber-300 hover:scale-110s box-content "
         />
         <div className="vignette z-10 absolute w-full h-full bg-transparent pointer-events-none"></div>
       </div>
