@@ -8,6 +8,9 @@ export default function FrontPageTerminal() {
   const el = useRef(null);
   const textAreaRef = useRef(null);
 
+  // Production API base for deployed frontend.
+  const apiBaseUrl = "https://api.sicari.works";
+
   // 1. Create a ref to store the Typed.js instance
   const typedInstance = useRef(null);
 
@@ -15,6 +18,7 @@ export default function FrontPageTerminal() {
   const [isTypingDone, setIsTypingDone] = useState(false);
   const [terminalHistory, setTerminalHistory] = useState([]);
   const [currentStep, setCurrentStep] = useState("COMMAND");
+  const [isProcessingInput, setIsProcessingInput] = useState(false);
 
   // 2. Wrap the animation logic to handle cleanup
   const startTypedAnimation = (strings, callback = null) => {
@@ -66,7 +70,14 @@ export default function FrontPageTerminal() {
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
+      if (!isTypingDone || isProcessingInput) {
+        return;
+      }
       const input = userInput.trim(); // Don't lowercase yet, IDs might be case-sensitive
+      if (!input) {
+        return;
+      }
+      setIsProcessingInput(true);
 
       if (currentStep === "COMMAND") {
         if (input.toLowerCase() === "login") {
@@ -79,6 +90,7 @@ export default function FrontPageTerminal() {
           startTypedAnimation([
             "<br/>>ACCESSING DATABASE... ^500 <br/>> ENTER GOON ID: ",
           ]);
+          setIsProcessingInput(false);
         } else if (input.toLowerCase() === "sign up") {
           setTerminalHistory((prev) => [
             ...prev,
@@ -89,11 +101,13 @@ export default function FrontPageTerminal() {
           startTypedAnimation([
             "<br/>WELCOME !... ^500 <br/>> ENTER GOON ID: ",
           ]);
+          setIsProcessingInput(false);
         } else {
           startTypedAnimation([
             '<br/>INVALID COMMAND. ^300 <br/>> Type "Login" or "Sign Up": ',
           ]);
           setUserInput("");
+          setIsProcessingInput(false);
         }
       } else if (currentStep === "ID") {
         // Save ID and move to Password
@@ -101,16 +115,23 @@ export default function FrontPageTerminal() {
         setLoginData((prev) => ({ ...prev, username: input }));
         setUserInput("");
         getUsers().then((users) => {
+          if (!Array.isArray(users)) {
+            startTypedAnimation(["<br/>SERVER DOWN :( ^800"]);
+            setIsProcessingInput(false);
+            return;
+          }
           const user = users.find((u) => u.username == input);
           if (!user) {
             startTypedAnimation(["<br/>NO SUCH USER EXISTS ^500 <br/>>"]);
+            setIsProcessingInput(false);
           } else {
             setCurrentStep("PASS");
+            startTypedAnimation([
+              "<br/>ENCRYPTING CHANNEL... ^500 <br/>> ENTER PASSWORD: ",
+            ]);
+            setIsProcessingInput(false);
           }
         });
-        startTypedAnimation([
-          "<br/>ENCRYPTING CHANNEL... ^500 <br/>> ENTER PASSWORD: ",
-        ]);
       } else if (currentStep === "PASS") {
         /*
     const url = 'http://localhost:8080/api/register'; 
@@ -153,43 +174,51 @@ fetch(url)
 
         // Here you would call your handleLogin(loginData.username, input) function
         startTypedAnimation(["<br/>VERIFYING... ^800 " + loginData.username]);
-        const url = "https://api.sicari.works/api/users";
-        fetch(url)
-          .then((response) => response.json())
-          .then((usersList) => {
-            console.log("All registered users:", usersList, typeof usersList);
-            const user = usersList.find(
-              (u) => u.username == loginData.username,
-            );
-            if (user) {
-              console.log(user);
-              if (user.password == input) {
-                startTypedAnimation(
-                  [
-                    "<br/>ACCESS GRANTED. Welcome, ^500" + loginData.username,
-                    "^200",
-                  ],
-                  () => {
-                    navigate("/feed");
-                  },
-                );
-              } else {
-                startTypedAnimation([
-                  "<br/>INVALID PASSWORD, TRY AGAIN . . . ^500" +
-                    loginData.username,
-                ]);
-              }
+        fetch(`${apiBaseUrl}/api/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: loginData.username,
+            password: input,
+          }),
+        })
+          .then(async (response) => {
+            const data = await response.json();
+            if (!response.ok) {
+              throw new Error(data?.message || "Login failed");
             }
+            return data;
+          })
+          .then((data) => {
+            if (data?.token) {
+              localStorage.setItem("authToken", data.token);
+            }
+            startTypedAnimation(
+              ["<br/>ACCESS GRANTED. Welcome, ^500" + loginData.username, "^200"],
+              () => {
+                navigate("/feed");
+              },
+            );
           })
           .catch((error) => {
-            console.error("Error fetching users:", error);
+            console.error("Login error:", error);
             startTypedAnimation([
-              "<br/>SERVER DOWN :( ^800 " + loginData.username,
+              "<br/>INVALID CREDENTIALS, TRY AGAIN . . . ^500" + loginData.username,
             ]);
+          })
+          .finally(() => {
+            setIsProcessingInput(false);
           });
       } else if (currentStep === "ID_signup") {
         setTerminalHistory((prev) => [...prev, `> ENTER GOON ID: ${input}`]);
         getUsers().then((users) => {
+          if (!Array.isArray(users)) {
+            startTypedAnimation(["<br/>SERVER DOWN :( ^800"]);
+            setIsProcessingInput(false);
+            return;
+          }
           const user = users.find((u) => u.username == input);
           if (!user) {
             setLoginData((prev) => ({ ...prev, username: input }));
@@ -199,8 +228,10 @@ fetch(url)
             startTypedAnimation([
               "<br/>ENCRYPTING CHANNEL... ^500 <br/>> ENTER PASSWORD: ",
             ]);
+            setIsProcessingInput(false);
           } else {
             startTypedAnimation(["<br/>USERNAME ALREADY IN USE ! ^500 "]);
+            setIsProcessingInput(false);
           }
         });
       } else if (currentStep === "PASS_signup") {
@@ -212,7 +243,7 @@ fetch(url)
           "<br/>Storing in database ^800 " + loginData.username,
         ]);
         console.log(loginData);
-        const url = "https://api.sicari.works/api/register";
+        const url = `${apiBaseUrl}/api/register`;
         fetch(url, {
           method: "POST",
           headers: {
@@ -234,8 +265,13 @@ fetch(url)
             startTypedAnimation([
               "<br/>Server Down :(^800 " + loginData.username,
             ]);
+          })
+          .finally(() => {
+            setIsProcessingInput(false);
           });
         // Here you would call your handleLogin(loginData.username, input) function
+      } else {
+        setIsProcessingInput(false);
       }
     }
   };
@@ -246,7 +282,7 @@ fetch(url)
     //redirecting
   }
 
-  const url = "https://api.sicari.works/api/users";
+  const url = `${apiBaseUrl}/api/users`;
 
   async function getUsers() {
     try {
