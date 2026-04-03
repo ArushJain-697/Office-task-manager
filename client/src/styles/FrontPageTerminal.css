@@ -9,10 +9,10 @@
   display: inline-block;
   width: 10px;
   height: 1.2em;
-  background: #00FF41;
+  /* background: #00FF41; */
   margin-left: 4px;
   animation: blink 0.8s infinite;
-  vertical-align: middle;
+  /* vertical-align: middle; */
 
 }
 

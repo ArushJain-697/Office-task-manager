@@ -28,10 +28,15 @@ export default function FrontPageTerminal() {
     typedInstance.current = new Typed(el.current, {
       strings: strings,
       typeSpeed: 30,
-      showCursor: false, // Keep this false since you have a manual one
+      showCursor: true, // Keep this false since you have a manual one
+      cursorChar:'█',
       contentType: "html",
+      preStringTyped: (arrayPos, self) => {
+      self.cursor.style.display = "inline-block";
+    },
       onComplete: (self) => {
         setIsTypingDone(true);
+        self.cursor.style.display = "none";
         if (callback) {
           callback();
         }
@@ -278,7 +283,7 @@ fetch(url)
           {isTypingDone && (
             <span className="text-[#00FF41]">
               {userInput}
-              <span className="terminal-cursor text-transparent">█</span>
+              <span className="terminal-cursor ">█</span>
             </span>
           )}
         </div>
