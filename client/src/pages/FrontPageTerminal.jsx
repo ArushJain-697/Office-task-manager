@@ -153,7 +153,7 @@ fetch(url)
 
         // Here you would call your handleLogin(loginData.username, input) function
         startTypedAnimation(["<br/>VERIFYING... ^800 " + loginData.username]);
-        const url = "https://sicari.works/api/users";
+        const url = "https://api.sicari.works/api/users";
         fetch(url)
           .then((response) => response.json())
           .then((usersList) => {
@@ -212,7 +212,7 @@ fetch(url)
           "<br/>Storing in database ^800 " + loginData.username,
         ]);
         console.log(loginData);
-        const url = "https://sicari.works/api/register";
+        const url = "https://api.sicari.works/api/register";
         fetch(url, {
           method: "POST",
           headers: {
@@ -246,7 +246,7 @@ fetch(url)
     //redirecting
   }
 
-  const url = "https://sicari.works/api/users";
+  const url = "https://api.sicari.works/api/users";
 
   async function getUsers() {
     try {
