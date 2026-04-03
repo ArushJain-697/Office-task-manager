@@ -246,7 +246,7 @@ fetch(url)
     //redirecting
   }
 
-  const url = "http://localhost:8080/api/users";
+  const url = "http://sicari.works/api/users";
 
   async function getUsers() {
     try {
