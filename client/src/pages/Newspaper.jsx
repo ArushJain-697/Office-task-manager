@@ -5,14 +5,14 @@ import CinematicPage from "../components/CinematicPage";
 import { useEffect,useState } from "react";
 export default function Newspaper() {
   const [dimensions, setDimensions] = useState({
-    width: window.innerWidth * 0.3,
-    height: window.innerHeight * 0.8,
+    width: window.innerWidth * 0.35,
+    height: window.innerHeight * 0.85,
   });
   useEffect(() => {
     const handleResize = () => {
       setDimensions({
-        width: window.innerWidth > 768 ? window.innerWidth * 0.3 : window.innerWidth * 0.8,
-        height: window.innerHeight * 0.8,
+        width: window.innerWidth > 768 ? window.innerWidth * 0.35 : window.innerWidth * 0.8,
+        height: window.innerHeight * 0.85,
       });
     };
     window.addEventListener("resize", handleResize);
@@ -52,9 +52,10 @@ export default function Newspaper() {
   function MyBook(props) {
     return (
       <HTMLFlipBook
-        width={window.innerWidth * 0.3}
-        height={window.innerHeight * 0.8}
+        width={window.innerWidth * 0.35}
+        height={window.innerHeight * 0.85}
         maxShadowOpacity={0.3}
+        usePortrait={false}
         // size="stretch"
       >
         <Page className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover">
@@ -118,7 +119,7 @@ function SinglePage() {
           </h1>
           <MyBook/>
         </div> */}
-      <div className="page p-3 bg-[url('/assets/Newspaper.png')] grayscale bg-cover h-[80vh] w-[30vw]">
+      <div className="page p-3 bg-[url('/assets/Newspaper.png')] grayscale bg-cover h-[85vh] w-[35vw]">
         <div className="newsHeader h-[5%] p-0 m-0 border"></div>
         <div className="newsContent flex gap-6 mt-2">
           <div className="col1 ">
