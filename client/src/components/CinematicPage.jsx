@@ -14,15 +14,15 @@ const CinematicPage = ({ children }) => {
         scale: 1,
         filter: 'blur(0px)',
         transition: {
-          duration: 0.8, // Snappy but smooth
+          duration: 1, // Snappy but smooth
           ease: "easeOut", // Standard smooth decelerating curve
           // Or use a custom soft curve: ease: [0, 0, 0.2, 1]
         },
       }}
       exit={{
         opacity: 0,
-        scale: 1.5, // Zooming into the page
-        filter: 'blur(20px)',
+        scale: 1.1, // Zooming into the page
+        filter: 'blur(30px)',
         transition: {
           duration: 0.6,
           ease: "easeIn", // Accelerates away from the camera

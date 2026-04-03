@@ -44,7 +44,7 @@ export default function FrontPageTerminal() {
   // Initial Boot
   useEffect(() => {
     startTypedAnimation([
-      // "Welcome to the underworld linkedin !  ^1000 <br/> Are you a new user or a returning goon?<br/> ^500",
+      "Welcome to the underworld linkedin !  ^1000 <br/> Are you a new user or a returning goon?<br/> ^500",
       "> Type :  Login/Sign Up : ",
     ]);
 
@@ -235,7 +235,9 @@ fetch(url)
     }
   };
   function finished() {
-    startTypedAnimation(["<br/> ^800 Welcome  " + loginData.username]);
+    startTypedAnimation(["<br/> ^800 Welcome  " + loginData.username], () => {
+      navigate("/feed");
+    });
     //redirecting
   }
 

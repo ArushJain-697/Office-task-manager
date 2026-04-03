@@ -2,7 +2,22 @@ import "../styles/Newspaper.css";
 import React from "react";
 import HTMLFlipBook from "react-pageflip";
 import CinematicPage from "../components/CinematicPage";
+import { useEffect,useState } from "react";
 export default function Newspaper() {
+  const [dimensions, setDimensions] = useState({
+    width: window.innerWidth * 0.3,
+    height: window.innerHeight * 0.8,
+  });
+  useEffect(() => {
+    const handleResize = () => {
+      setDimensions({
+        width: window.innerWidth > 768 ? window.innerWidth * 0.3 : window.innerWidth * 0.8,
+        height: window.innerHeight * 0.8,
+      });
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   const Page = React.forwardRef((props, ref) => {
     return (
         <div className="demoPage bg-contain select-none z-3 " ref={ref}>
@@ -40,6 +55,7 @@ export default function Newspaper() {
         width={window.innerWidth * 0.3}
         height={window.innerHeight * 0.8}
         maxShadowOpacity={0.3}
+        // size="stretch"
       >
         <Page className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover">
           {/* <singlePage className="demoPage" /> */}

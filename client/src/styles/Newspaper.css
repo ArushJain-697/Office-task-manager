@@ -5,11 +5,23 @@
 .newsContent {
   font-family: "Noticia Text";
 }
+/* Force the pageflip container to stay within bounds */
+.stf__parent {
+  max-width: 100vw;
+  max-height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
+.stf__block {
+  /* Ensures the individual page containers don't overlap */
+  background-color: transparent !important;
+}
 .vignette {
   box-shadow: 0 0 12em 7em #000000 inset;
   scale:1.1;
-    animation: shakeLight 2s infinite alternate;
+    animation: shakeLight 4s infinite alternate;
 }
 @keyframes shakeLight {
   0% {
