@@ -20,24 +20,48 @@
 }
 .vignette {
   box-shadow: 0 0 12em 7em #000000 inset;
-  scale:1.1;
-    animation: shakeLight 4s infinite alternate;
+  scale: 1.1;
+  animation: shakeLight 4s infinite alternate;
 }
 @keyframes shakeLight {
   0% {
-    transform: translate(-2em,2em);
+    transform: translate(-2em, 2em);
   }
   33% {
-    transform:translate(2em,2em);
-}
-66% {
-      transform:translate(2em,-2em);
-    }
-    100% {
-      transform:translate(-2em,-2em);
+    transform: translate(2em, 2em);
+  }
+  66% {
+    transform: translate(2em, -2em);
+  }
+  100% {
+    transform: translate(-2em, -2em);
   }
 }
 .demoPage {
   backface-visibility: hidden; /* Prevents flickering during flips */
   transform-style: preserve-3d;
+  filter: sepia(10%) hue-rotate(330deg) saturate(300%);
+}
+
+.drop-cap::first-letter {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 68px;
+  font-weight: 900;
+  float: left;
+  line-height: 0.72;
+  margin: 7px 5px 0 0;
+  color: #1a1209;
+}
+.col-rule {
+  border-right: 1.5px solid #1a1209;
+}
+p {
+  text-align: justify;
+  hyphens: auto;
+}
+@font-face {
+  font-family: 'Hermeneus';
+  src: url('./assets/fonts/HermeneusOne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
