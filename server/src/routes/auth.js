@@ -31,6 +31,35 @@ function signToken(user) {
   );
 }
 
+// ==========================================
+// 🕵️ NEW: 2-STEP RECON (Username Check)
+// ==========================================
+router.post("/check-user", async (req, res) => {
+  try {
+    const { username } = req.body;
+    
+    if (!username) {
+      return res.status(400).json({ message: "Username is required." });
+    }
+
+    const [rows] = await pool.query(
+      "SELECT id FROM users WHERE username = ? LIMIT 1",
+      [username]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "No such goon exists." });
+    }
+
+    // Tell frontend it's safe to ask for password
+    return res.json({ exists: true }); 
+  } catch (error) {
+    console.error("Check user error:", error);
+    return internalError(res, "Internal server error", error);
+  }
+});
+// ==========================================
+
 router.post("/register", validateCredentials, async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -117,17 +146,19 @@ router.post("/login", validateCredentials, async (req, res) => {
   }
 });
 
-// NEW LOGOUT ROUTE!
 router.post("/logout", (req, res) => {
   res.clearCookie("jwt", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "strict", // Fixed this from "lax" to "strict" to properly clear it!
   });
   return res.json({ message: "Logged out successfully" });
 });
 
-router.get("/users", async (_req, res) => {
+// ==========================================
+// 🔒 SECURED: Added requireAuth Middleware!
+// ==========================================
+router.get("/users", requireAuth, async (_req, res) => {
   try {
     const [rows] = await pool.query(
       "SELECT id, username, created_at FROM users ORDER BY id DESC",
@@ -138,12 +169,13 @@ router.get("/users", async (_req, res) => {
     return internalError(res, "Internal server error", error);
   }
 });
+// ==========================================
 
 router.get("/me", requireAuth, async (req, res) => {
   try {
     const [rows] = await pool.query(
       "SELECT id, username, created_at FROM users WHERE id = ? LIMIT 1",
-      [req.user.sub],
+      [req.user.sub], // Note: Your signToken uses user.id -> sub
     );
 
     const user = rows[0];
