@@ -7,6 +7,14 @@ const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
+// Configuration for our secure cookie
+const cookieOptions = {
+  httpOnly: true, // Javascript cannot read it (prevents XSS)
+  secure: process.env.NODE_ENV === "production", // Only sends over HTTPS in production
+  sameSite: "strict", // Protects against CSRF attacks
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+};
+
 function internalError(res, message, error) {
   const response = { message };
   if (process.env.NODE_ENV !== "production") {
@@ -45,10 +53,12 @@ router.post("/register", validateCredentials, async (req, res) => {
     const user = { id: insertResult.insertId, username };
     const token = signToken(user);
 
+    // ATTACH COOKIE HERE
+    res.cookie("jwt", token, cookieOptions);
+
     return res.status(201).json({
       message: "User created",
-      user,
-      token,
+      user, // Notice: No token in the JSON!
     });
   } catch (error) {
     console.error("Register error:", error);
@@ -78,7 +88,6 @@ router.post("/login", validateCredentials, async (req, res) => {
     if (isBcryptHash) {
       isMatch = await bcrypt.compare(password, storedPassword);
     } else {
-      // Legacy fallback for plaintext rows; upgraded to hash after successful login.
       isMatch = storedPassword === password;
       if (isMatch) {
         const upgradedHash = await bcrypt.hash(password, 12);
@@ -93,15 +102,29 @@ router.post("/login", validateCredentials, async (req, res) => {
     }
 
     const token = signToken(user);
+
+    // ATTACH COOKIE HERE
+    res.cookie("jwt", token, cookieOptions);
+
     return res.json({
       message: "Login successful",
       user: { id: user.id, username: user.username },
-      token,
+      // Notice: No token in the JSON!
     });
   } catch (error) {
     console.error("Login error:", error);
     return internalError(res, "Internal server error", error);
   }
+});
+
+// NEW LOGOUT ROUTE!
+router.post("/logout", (req, res) => {
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+  return res.json({ message: "Logged out successfully" });
 });
 
 router.get("/users", async (_req, res) => {

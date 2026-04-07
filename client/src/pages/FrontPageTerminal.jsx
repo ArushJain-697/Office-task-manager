@@ -33,11 +33,11 @@ export default function FrontPageTerminal() {
       strings: strings,
       typeSpeed: 30,
       showCursor: true, // Keep this false since you have a manual one
-      cursorChar:'█',
+      cursorChar: '█',
       contentType: "html",
       preStringTyped: (arrayPos, self) => {
-      self.cursor.style.display = "inline-block";
-    },
+        self.cursor.style.display = "inline-block";
+      },
       onComplete: (self) => {
         setIsTypingDone(true);
         self.cursor.style.display = "none";
@@ -179,6 +179,7 @@ fetch(url)
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include", // REQUIRES COOKIES
           body: JSON.stringify({
             username: loginData.username,
             password: input,
@@ -251,6 +252,7 @@ fetch(url)
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include", // REQUIRES COOKIES
           // This is the data he is sending to your backend
           body: JSON.stringify({
             username: loginData.username,
@@ -288,7 +290,9 @@ fetch(url)
 
   async function getUsers() {
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: "include" // NEEDED FOR PROTECTED GET ROUTES
+      });
 
       // Check if the server returned an error (like 404 or 500)
       if (!response.ok) {
