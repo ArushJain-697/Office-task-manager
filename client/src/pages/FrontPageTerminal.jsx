@@ -146,7 +146,7 @@ export default function FrontPageTerminal() {
         setIsProcessingInput(true);
 
         startTypedAnimation(["<br/>VERIFYING... ^800 "]);
-        
+
         // 
         fetch(`${apiBaseUrl}/api/auth/login`, {
           method: "POST",
@@ -162,7 +162,8 @@ export default function FrontPageTerminal() {
           .then(async (response) => {
             const data = await response.json();
             if (!response.ok) {
-              throw new Error(data?.message || "Login failed");
+              // Check for data.error from Syndicate Edge Guard, or data.message
+              throw new Error(data?.error || data?.message || "Login failed");
             }
             return data;
           })
@@ -193,7 +194,7 @@ export default function FrontPageTerminal() {
         ]);
         setIsProcessingInput(false);
       } else if (currentStep === "PASS_signup") {
-        
+
         setTerminalHistory((prev) => [...prev, `> ENTER PASSWORD: ********`]);
         const password = input;
         setUserInput("");
@@ -216,9 +217,9 @@ export default function FrontPageTerminal() {
           .then(async (response) => {
             const data = await response.json();
             if (!response.ok) {
-              // This will catch "Username already in use"
+              // This will catch Edge Guard 'error' or authController 'message'
               throw new Error(
-                data?.message || `Registration failed: ${response.status}`,
+                data?.error || data?.message || `Registration failed: ${response.status}`,
               );
             }
             return data;
