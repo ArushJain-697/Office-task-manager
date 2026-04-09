@@ -42,27 +42,27 @@ app.use(cookieParser());
 // ==========================================
 // 🛡️ THE SYNDICATE EDGE GUARD (v2 - Timing Safe)
 // ==========================================
-app.use((req, res, next) => {
-  if (process.env.NODE_ENV !== "production") return next();
+// app.use((req, res, next) => {
+//   if (process.env.NODE_ENV !== "production") return next();
 
-  // If you kept 'x-edge' instead of 'x-syndicate-signature', ensure this matches your Cloudflare Transform Rule
-  const incomingToken = req.headers['x-edge']; 
-  const expectedToken = process.env.EDGE_SECRET;
+//   // If you kept 'x-edge' instead of 'x-syndicate-signature', ensure this matches your Cloudflare Transform Rule
+//   const incomingToken = req.headers['x-edge']; 
+//   const expectedToken = process.env.EDGE_SECRET;
 
-  if (!incomingToken || !expectedToken) {
-    return res.status(403).json({ error: "Access Denied. Missing Signature." });
-  }
+//   if (!incomingToken || !expectedToken) {
+//     return res.status(403).json({ error: "Access Denied. Missing Signature." });
+//   }
 
-  try {
-    const isMatch = crypto.timingSafeEqual(Buffer.from(incomingToken), Buffer.from(expectedToken));
-    if (!isMatch) throw new Error("Mismatch");
-  } catch (err) {
-    console.warn(`🚨 UNAUTHORIZED ORIGIN ATTEMPT: ${req.ip}`);
-    return res.status(403).json({ error: "Access Denied. Invalid Edge Signature." });
-  }
+//   try {
+//     const isMatch = crypto.timingSafeEqual(Buffer.from(incomingToken), Buffer.from(expectedToken));
+//     if (!isMatch) throw new Error("Mismatch");
+//   } catch (err) {
+//     console.warn(`🚨 UNAUTHORIZED ORIGIN ATTEMPT: ${req.ip}`);
+//     return res.status(403).json({ error: "Access Denied. Invalid Edge Signature." });
+//   }
 
-  next(); 
-});
+//   next(); 
+// });
 // ==========================================
 
 app.get("/api", (_req, res) => {
