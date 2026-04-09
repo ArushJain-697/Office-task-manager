@@ -147,7 +147,7 @@ export default function FrontPageTerminal() {
 
         startTypedAnimation(["<br/>VERIFYING... ^800 "]);
         
-        // 🔒 FIX 1: Updated URL to include /auth, removed x-edge header
+        // 
         fetch(`${apiBaseUrl}/api/auth/login`, {
           method: "POST",
           headers: {
@@ -193,7 +193,7 @@ export default function FrontPageTerminal() {
         ]);
         setIsProcessingInput(false);
       } else if (currentStep === "PASS_signup") {
-        // Sign Up Flow: Password entered, call the API
+        
         setTerminalHistory((prev) => [...prev, `> ENTER PASSWORD: ********`]);
         const password = input;
         setUserInput("");
@@ -201,7 +201,6 @@ export default function FrontPageTerminal() {
 
         startTypedAnimation(["<br/>CREATING IDENTITY... ^800 "]);
 
-        // 🔒 FIX 2: Updated URL to include /auth
         fetch(`${apiBaseUrl}/api/auth/register`, {
           method: "POST",
           headers: {
@@ -225,7 +224,6 @@ export default function FrontPageTerminal() {
             return data;
           })
           .then((data) => {
-            // SUCCESS! The cookie is set, and we can log the user in.
             startTypedAnimation(
               [
                 `<br/>REGISTRATION COMPLETE. Welcome, ^500${data.user.username}`,
