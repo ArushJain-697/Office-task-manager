@@ -1,14 +1,32 @@
 import "../styles/Newspaper.css";
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import HTMLFlipBook from "react-pageflip";
 import CinematicPage from "../components/CinematicPage";
-import { useEffect, useState } from "react";
 import "../scripts/fittext.js";
+// import EvidenceGun from "../components/EvidenceGun.jsx";
+
+// 1. MOVED OUTSIDE: This prevents React from destroying the pages on every click!
+const Page = React.forwardRef((props, ref) => {
+  return props.front === false ? (
+    <div className="demoPage bg-contain select-none z-3" ref={ref}>
+      <SinglePage />
+    </div>
+  ) : (
+    <div className="demoPage bg-contain select-none z-3" ref={ref}>
+      <FrontPage />
+    </div>
+  );
+});
+
 export default function Newspaper() {
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth * 0.35,
     height: window.innerHeight * 0.85,
   });
+
+  const [isOpened, setIsOpened] = useState(false);
+  const bookRef = useRef(null);
+
   useEffect(() => {
     const handleResize = () => {
       setDimensions({
@@ -22,200 +40,136 @@ export default function Newspaper() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  const Page = React.forwardRef((props, ref) => {
-    return props.front == false ? (
-      <div className="demoPage bg-contain select-none z-3 " ref={ref}>
-        <SinglePage />
-      </div>
-    ) : (
-      <div className="demoPage bg-contain select-none z-3 " ref={ref}>
-        <FrontPage />
-      </div>
-    );
-  });
-  // function MyBook(props) {
-  //     return (
-  //         <HTMLFlipBook width={300} height={500}>
-  //             <Page number="1">Page text</Page>
-  //             <Page number="2">Page text</Page>
-  //             <Page number="3">Page text</Page>
-  //             <Page number="4">Page text</Page>
-  //         </HTMLFlipBook>
-  //     );
-  // }
-  // function MyBook(props) {
-  //     return (
-  //         <HTMLFlipBook width={300} height={500}>
-  //             <Page number="1">Page text</Page>
-  //             <Page number="2">Page text</Page>
-  //             <Page number="3">Page text</Page>
-  //             <Page number="4">Page text</Page>
-  //         </HTMLFlipBook>
-  //     );
-  // }
-
-  function MyBook(props) {
-    return (
-      <HTMLFlipBook
-        width={window.innerWidth * 0.35}
-        height={window.innerHeight * 0.85}
-        maxShadowOpacity={0.3}
-        usePortrait={false}
-        // size="stretch"
-      >
-        <Page
-          className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover "
-          front={true}
-        ></Page>
-        <Page
-          className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover "
-          front={false}
-        ></Page>
-        <Page
-          className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover "
-          front={false}
-        ></Page>
-        <Page
-          className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover "
-          front={false}
-        ></Page>
-        <Page
-          className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover "
-          front={false}
-        ></Page>
-        <Page
-          className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover "
-          front={false}
-        ></Page>
-        <Page
-          className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover "
-          front={false}
-        ></Page>
-        <Page
-          className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover "
-          front={false}
-        ></Page>
-        <Page
-          className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover "
-          front={false}
-        ></Page>
-        <Page
-          className="demoPage bg-[url('/assets/Newspaper.png')] bg-cover "
-          front={false}
-        ></Page>
-      </HTMLFlipBook>
-    );
-  }
-  function SinglePage() {
-    return (
-      <>
-        {/* <MyBook  /> */}
-        {/* <div className="main bg-[url('/assets/Newspaper.png')] w-[80vw] bg-black h-[80vh] bg-contain repeat">
-          5
-          <h1 className="newspaperTitle text-7xl font-[cursive] text-center  text-gray-800">
-            Linked Out
-          </h1>
-          <MyBook/>
-        </div> */}
-        <div className="page p-3 bg-[url('/assets/Newspaper.png')] grayscale bg-cover h-[85vh] w-[35vw]">
-          <div className="newsHeader h-[5%] p-0 m-0 border"></div>
-          <div className="newsContent flex gap-6 mt-2">
-            <div className="col1 ">
-              <h2 className="newsHeading text-2xl text-center">Falana 1</h2>
-              <img
-                src="/assets/test.png"
-                className="newsImage max-w-[55%] float-left mr-4 "
-              />
-              <p className="newsContent text-justify">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
-                numquam quaerat ipsa commodi earum optio quia ut, quis
-                distinctio pariatur cumque amet vitae dolore non nobis. Atque
-                numquam nihil facere vitae quis aliquid incidunt quia, voluptas
-                sequi. Nam, at maiores! Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Itaque blanditiis omnis doloribus quidem.
-                Fugiat obcaecati veritatis ea nihil! Eveniet similique inventore
-                at, tempora numquam delectus quidem pariatur recusandae odio
-                rem?
-              </p>
-            </div>
-            <div className="col2 ">
-              <h2 className="newsHeading text-2xl text-center">Falana 2</h2>
-              <img
-                src={"/assets/test.png"}
-                className="newsImage max-w-[55%] float-left mr-4"
-              />
-              <p className="newsContent text-justify">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
-                numquam quaerat ipsa commodi earum optio quia ut, quis
-                distinctio pariatur cumque amet vitae dolore non nobis. Atque
-                numquam nihil facere vitae quis aliquid incidunt quia, voluptas
-                sequi. Nam, at maiores! Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Itaque blanditiis omnis doloribus quidem.
-                Fugiat obcaecati veritatis ea nihil! Eveniet similique inventore
-                at, tempora numquam delectus quidem pariatur recusandae odio
-                rem?
-              </p>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
-  function FrontPage() {
-    return (
-      <div className="page p-3 bg-[url('/assets/Newspaper.png')] grayscale bg-cover h-[85vh] w-[35vw] flex items-center flex-col">
-        <div className="w-full h-[0.3em] m-1 font-black block bg-black"></div>
-        <div className="w-full h-[0.05em] mb-1 font-black block bg-black"></div>
-        <img src="/assets/newsPaperName.svg" alt="" className="w-[95%] " />
-        <div className="w-full h-[0.3em] m-1 mb-0 font-black block bg-black"></div>
-        <div className="font-[Arapey] text-[1.1em] flex justify-between pl-5 pr-5 w-full">
-          <span>Vol1</span>
-          <span className="italic">Sin City's Oly trusted Daily</span>
-          <span>Price:$0.50</span>
-        </div>
-        <div className="w-full h-[0.05em] mt-0 font-black block bg-black"></div>
-        <div className="w-full h-[0.3em] m-1 font-black block bg-black"></div>
-        <div className="content flex flex-col items-center w-[95%] h-full">
-          <img src="/assets/crime.svg" alt="" className="w-[95%] m-5" />
-          <div className="w-full h-[0.3em] m-1 font-black block bg-black"></div>
-          <div className="w-full h-[0.05em] mt-0 font-black block bg-black"></div>
-          <div className="paragraphs h-full w-full flex gap-4 mt-3 flex-col ">
-            <div className=" w-full h-full ">
-              <img
-                src="/assets/test.png"
-                className="newsImage max-w-[45%] float-left mr-4 "
-              />
-              <p className="newsContent text-justify">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
-                numquam quaerat ipsa commodi earum optio quia ut, quis ectus
-                quidem pariatur recusandae odio rem?numquam quaerat ipsa com
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                Aliquam neque tempore cupiditate, asperiores doloribus
-                consequatur ab inventore dolorem it. Tempore, nobis.modi earum
-                optio quia ut, quis ectus quidem pariatur recusandae odio rem?
-              </p>
-              <div className="advertisement w-full border-2 p-8 mt-1 flex items-center justify-center">
-                <h1 className="text-3xl"> This is some Advertisement</h1>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <CinematicPage>
-      <div className="bgTable bg-[url('/assets/table.png')] fixed inset-0 flex justify-center items-center bg-cover overflow-hidden">
-        <MyBook />
+      <div className=" bgTable bg-[url('/assets/table.png')] fixed inset-0 flex justify-center items-center bg-cover overflow-hidden">
+        {/* 1. DARK OVERLAY */}
+        <div
+          onClick={() => setIsOpened(false)}
+          className={` fixed inset-0 bg-black/70 transition-all duration-700 z-20 ${
+            isOpened
+              ? "opacity-100 backdrop-blur-md pointer-events-auto"
+              : "opacity-0 pointer-events-none backdrop-blur-none"
+          }`}
+        />
+
+        {/* 2. STATIC IMAGE (ON TABLE) */}
+        <div
+          onClick={() => setIsOpened(true)}
+          className={`absolute transition-all duration-700 z-10 cursor-pointer shadow-2xl ${
+            isOpened
+              ? "opacity-0 scale-150 blur-xl pointer-events-none"
+              : "opacity-100 scale-100 "
+          }`}
+          style={{
+            // Replaced 200px with 15vw (15% of screen width)
+            // Replaced -100px with -10vh (10% of screen height)
+            transform: !isOpened
+              ? "rotate(45deg) scale(0.5) translate(15vw, -10vh)"
+              : "none",
+            transformOrigin: "center center",
+          }}
+        >
+          <img
+            src="/assets/frontPageBG.png"
+            className="hover:border-8 p-2 border-amber-300 max-w-[35vw]"
+            alt="newspaper-folded"
+          />
+        </div>
+
+        {/* 3. THE ACTUAL BOOK */}
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className={`relative transition-all duration-700 z-30 ${
+            isOpened
+              ? "opacity-100 scale-100 blur-0"
+              : "opacity-0 rotate-45 scale-75 blur-lg pointer-events-none"
+          }`}
+        >
+          <HTMLFlipBook
+            width={dimensions.width}
+            height={dimensions.height}
+            showCover={true}
+            usePortrait={false}
+            ref={bookRef}
+            className="shadow-2xl"
+            startZIndex={30}
+            maxShadowOpacity={0.3}
+            disableFlipByClick={!isOpened}
+          >
+            <Page front={true} />
+            <Page front={false} />
+            <Page front={false} />
+            <Page front={false} />
+            <Page front={false} />
+            <Page front={false} />
+            <Page front={false} />
+            <Page front={false} />
+            <Page front={false} />
+            <Page front={false} />
+            <Page front={false} />
+            <Page front={false} />
+            <Page front={false} />
+            <Page front={false} />
+          </HTMLFlipBook>
+        </div>
+
+        {/* DECORATION */}
         <img
           src="/assets/wanted.jpeg"
           alt="wanted image"
           draggable={false}
-          className="absolute right-20 top-10 rotate-45 max-w-30 p-1 hover:border-2 border-amber-300 hover:scale-110s box-content "
+          className="absolute right-20 top-15 rotate-160 max-w-30 p-1 hover:border-2 border-amber-300 hover:scale-110s box-content "
         />
-        <div className="vignette z-10 absolute w-full h-full bg-transparent pointer-events-none"></div>
+        {/* <EvidenceGun /> */}
       </div>
     </CinematicPage>
+  );
+}
+
+function SinglePage() {
+  return (
+    <div className="page p-3 bg-[url('/assets/Newspaper.png')] grayscale bg-cover h-[85vh] w-[35vw]">
+      <div className="newsHeader h-[5%] p-0 m-0 border"></div>
+      <div className="newsContent flex gap-6 mt-2">
+        <div className="col1">
+          <h2 className="newsHeading text-2xl text-center">Falana 1</h2>
+          <img
+            src="/assets/test.png"
+            className="newsImage max-w-[55%] float-left mr-4"
+            alt="news"
+          />
+          <p className="newsContent text-justify">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
+            numquam quaerat ipsa commodi earum optio quia ut, quis distinctio
+            pariatur cumque amet vitae dolore non nobis. Atque numquam nihil
+            facere vitae quis aliquid incidunt quia, voluptas sequi.
+          </p>
+        </div>
+        <div className="col2">
+          <h2 className="newsHeading text-2xl text-center">Falana 2</h2>
+          <img
+            src={"/assets/test.png"}
+            className="newsImage max-w-[55%] float-left mr-4"
+            alt="news"
+          />
+          <p className="newsContent text-justify">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
+            numquam quaerat ipsa commodi earum optio quia ut, quis distinctio
+            pariatur cumque amet vitae dolore non nobis. Atque numquam nihil
+            facere vitae quis aliquid incidunt quia, voluptas sequi.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FrontPage() {
+  return (
+    <div className="page p-3 bg-[url('/assets/Newspaper.png')] grayscale bg-contain h-[85vh] w-[35vw] flex items-center flex-col">
+      <img src="/assets/frontPageBG.png" alt="front page" className="w-[90%]" />
+    </div>
   );
 }
