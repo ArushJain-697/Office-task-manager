@@ -20,6 +20,7 @@ export default function FrontPageTerminal() {
   const [terminalHistory, setTerminalHistory] = useState([]);
   const [currentStep, setCurrentStep] = useState("ROLE");
   const [isProcessingInput, setIsProcessingInput] = useState(false);
+  const [userRole, setUserRole] = useState("sicario");
 
   // 2. Wrap the animation logic to handle cleanup
   const startTypedAnimation = (strings, callback = null) => {
@@ -67,7 +68,6 @@ export default function FrontPageTerminal() {
   }, []);
 
   const [loginData, setLoginData] = useState({ username: "", pass: "" });
-let userRole=""
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -83,7 +83,7 @@ let userRole=""
       if (currentStep === "ROLE") {
         const roleInput = input.toLowerCase();
         if (roleInput === "sicario" || roleInput === "fixer") {
-          userRole=roleInput;
+          setUserRole(roleInput);
           setTerminalHistory((prev) => [
             ...prev,
             `> Type :  sicario/fixer : ${input}`,
@@ -158,7 +158,7 @@ let userRole=""
           body: JSON.stringify({
             username: loginData.username,
             password: password,
-            // role:userRole,
+            role: userRole,
           }),
         })
           .then(async (response) => {

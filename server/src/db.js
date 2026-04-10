@@ -18,9 +18,26 @@ async function initDatabase() {
       username VARCHAR(100) NOT NULL UNIQUE,
       email VARCHAR(255),
       password VARCHAR(255) NOT NULL,
-      role VARCHAR(50) DEFAULT 'mercenary',
+      role VARCHAR(50) DEFAULT 'sicario',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
+  `);
+
+  // Ensure role column can store the new role names.
+  await pool.query(`
+    ALTER TABLE users
+    MODIFY COLUMN role VARCHAR(50) NOT NULL DEFAULT 'sicario'
+  `);
+
+  // Role migration to the new vocabulary used by the app.
+  await pool.query(`
+    UPDATE users
+    SET role = CASE
+      WHEN role = 'mercenary' THEN 'fixer'
+      WHEN role = 'mastermind' THEN 'sicario'
+      ELSE role
+    END
+    WHERE role IN ('mercenary', 'mastermind')
   `);
 
   await pool.query(`

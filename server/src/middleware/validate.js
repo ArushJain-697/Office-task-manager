@@ -3,7 +3,7 @@ const { z } = require("zod");
 const credentialsSchema = z.object({
   username: z.string().trim().min(3).max(100),
   password: z.string().min(6).max(128),
-  role: z.enum(["mercenary", "fixer"]).default("mercenary"),
+  role: z.enum(["sicario", "fixer"]).default("sicario"),
 });
 
 function validateCredentials(req, res, next) {
