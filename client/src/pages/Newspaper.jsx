@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import HTMLFlipBook from "react-pageflip";
 import CinematicPage from "../components/CinematicPage";
 import "../scripts/fittext.js";
-// import EvidenceGun from "../components/EvidenceGun.jsx";
+import EvidenceGun from "../components/EvidenceGun.jsx";
 
 // 1. MOVED OUTSIDE: This prevents React from destroying the pages on every click!
 const Page = React.forwardRef((props, ref) => {
@@ -57,7 +57,7 @@ export default function Newspaper() {
         {/* 2. STATIC IMAGE (ON TABLE) */}
         <div
           onClick={() => setIsOpened(true)}
-          className={`absolute transition-all duration-700 z-10 cursor-pointer shadow-2xl ${
+          className={`absolute transition-all duration-700 z-20 cursor-pointer shadow-2xl ${
             isOpened
               ? "opacity-0 scale-150 blur-xl pointer-events-none"
               : "opacity-100 scale-100 "
@@ -73,7 +73,7 @@ export default function Newspaper() {
         >
           <img
             src="/assets/frontPageBG.png"
-            className="hover:border-8 p-2 border-amber-300 max-w-[35vw]"
+            className="hover:border-8 p-2 border-amber-300 max-w-[35vw] z-20"
             alt="newspaper-folded"
           />
         </div>
@@ -120,9 +120,9 @@ export default function Newspaper() {
           src="/assets/wanted.jpeg"
           alt="wanted image"
           draggable={false}
-          className="absolute right-20 top-15 rotate-160 max-w-30 p-1 hover:border-2 border-amber-300 hover:scale-110s box-content "
+          className="absolute right-20 z-19 top-15 rotate-160 max-w-30 p-1 hover:border-2 border-amber-300 hover:scale-110s box-content "
         />
-        {/* <EvidenceGun /> */}
+        <EvidenceGun />
       </div>
     </CinematicPage>
   );
