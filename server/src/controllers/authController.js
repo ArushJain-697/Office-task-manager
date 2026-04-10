@@ -1,4 +1,19 @@
-// ... (Upar ka imports aur cookieOptions same rakhna)
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { pool } = require("../db");
+
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+};
+
+function internalError(res, message, error) {
+    const response = { message };
+    if (process.env.NODE_ENV !== "production") response.error = error.message;
+    return res.status(500).json(response);
+}
 
 // 1. Token mein role pack karo
 function signToken(user) {
@@ -9,23 +24,33 @@ function signToken(user) {
     );
 }
 
+exports.checkUser = async (req, res) => {
+    try {
+        const { username } = req.body;
+        if (!username) return res.status(400).json({ message: "Username is required." });
+
+        const [rows] = await pool.query("SELECT id FROM users WHERE username = ? LIMIT 1", [username]);
+        if (rows.length === 0) return res.status(404).json({ message: "No such goon exists." });
+
+        return res.json({ exists: true });
+    } catch (error) { return internalError(res, "Internal server error", error); }
+};
+
 // 2. Register mein role save karo
 exports.register = async (req, res) => {
     try {
-        // NAYA: req.body se role bhi extract karo
-        const { username, password, role } = req.body; 
+        const { username, password, role } = req.body;
         const [existingRows] = await pool.query("SELECT id FROM users WHERE username = ? LIMIT 1", [username]);
         if (existingRows.length > 0) return res.status(409).json({ message: "Username already in use" });
 
         const passwordHash = await bcrypt.hash(password, 12);
         const derivedEmail = `${username}@sicari.local`;
         
-        // NAYA: Agar user ne role nahi diya, toh default 'sicario' bana do
-        const assignedRole = role || "sicario"; 
+        const assignedRole = role || "sicario";
 
         const [insertResult] = await pool.query(
             "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)",
-            [username, derivedEmail, passwordHash, assignedRole] // Role DB mein chala gaya
+            [username, derivedEmail, passwordHash, assignedRole]
         );
 
         const user = { id: insertResult.insertId, username, role: assignedRole };
@@ -40,7 +65,6 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { username, password } = req.body;
-        // NAYA: Select query mein 'role' add kiya
         const [rows] = await pool.query("SELECT id, username, password, role FROM users WHERE username = ? LIMIT 1", [username]);
 
         const user = rows[0];
@@ -69,15 +93,28 @@ exports.login = async (req, res) => {
     } catch (error) { return internalError(res, "Internal server error", error); }
 };
 
+exports.logout = (req, res) => {
+    res.clearCookie("jwt", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
+    return res.json({ message: "Logged out successfully" });
+};
+
+exports.getUsers = async (_req, res) => {
+    try {
+        const [rows] = await pool.query("SELECT id, username, created_at FROM users ORDER BY id DESC");
+        return res.json(rows);
+    } catch (error) { return internalError(res, "Internal server error", error); }
+};
+
 // 4. /me mein role wapas bhejo React ke liye
 exports.getMe = async (req, res) => {
     try {
-        // NAYA: Select query mein 'role' add kiya
         const [rows] = await pool.query("SELECT id, username, role, created_at FROM users WHERE id = ? LIMIT 1", [req.user.sub]);
         const user = rows[0];
         if (!user) return res.status(404).json({ message: "User not found" });
         return res.json({ user });
     } catch (error) { return internalError(res, "Internal server error", error); }
 };
-
-// ... (Baaki checkUser, logout, getUsers functions waise hi rahenge)
