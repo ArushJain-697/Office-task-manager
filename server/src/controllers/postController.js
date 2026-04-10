@@ -2,11 +2,6 @@
 const { pool } = require("../db");
 const { uploadToCloudinary } = require("../utils/cloudinary");
 exports.createPost = async (req, res) => {
-  console.log("BODY:", req.body);
-  console.log("FILE:", req.file);
-  console.log("HEADERS:", req.headers['content-type']);
-}
-exports.createPost = async (req, res) => {
   try {
     const { content } = req.body;
 
