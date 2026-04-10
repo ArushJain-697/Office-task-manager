@@ -81,6 +81,12 @@ app.use((err, _req, res, _next) => {
   if (err && err.message === "Only image files are allowed (jpg, png, webp, gif)") {
     return res.status(400).json({ message: err.message });
   }
+  if (err && err.code === "MISSING_FIELD_NAME") {
+    return res.status(400).json({ message: "File field name missing. Use 'photo' as the key." });
+  }
+  if (err && err.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({ message: "File too large. Max 5MB." });
+  }
   console.error("Unhandled error:", err);
   const response = { message: "Internal server error" };
   if (process.env.NODE_ENV !== "production") response.error = err?.message || "Unknown error";
