@@ -62,7 +62,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, role } = req.body;
     const [rows] = await pool.query(
       "SELECT id, username, password, role FROM users WHERE username = ? LIMIT 1",
       [username]
@@ -70,6 +70,10 @@ exports.login = async (req, res) => {
 
     const user = rows[0];
     if (!user) return res.status(401).json({ message: "Invalid username or password" });
+
+    if (role && role !== user.role) {
+      return res.status(401).json({ message: "Invalid role for this username" });
+    }
 
     const storedPassword = user.password || "";
     const isBcryptHash =

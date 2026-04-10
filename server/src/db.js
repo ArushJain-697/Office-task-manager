@@ -12,6 +12,22 @@ const pool = mysql.createPool({
 });
 
 async function initDatabase() {
+  async function ensureColumnExists(tableName, columnName, columnDef) {
+    const [rows] = await pool.query(
+      `SELECT 1
+       FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = ?
+         AND COLUMN_NAME = ?
+       LIMIT 1`,
+      [tableName, columnName]
+    );
+
+    if (rows.length === 0) {
+      await pool.query(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDef}`);
+    }
+  }
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -70,10 +86,30 @@ async function initDatabase() {
       title VARCHAR(200) NOT NULL,
       description TEXT NOT NULL,
       required_skills JSON NOT NULL,
+      heading VARCHAR(200),
+      subheading VARCHAR(200),
+      quote TEXT,
+      timeline VARCHAR(500),
+      crew_details JSON,
+      photos JSON,
+      short_description TEXT,
       status VARCHAR(50) DEFAULT 'open',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (fixer_id) REFERENCES users(id) ON DELETE CASCADE
     )
+  `);
+
+  await ensureColumnExists("heists", "heading", "VARCHAR(200)");
+  await ensureColumnExists("heists", "subheading", "VARCHAR(200)");
+  await ensureColumnExists("heists", "quote", "TEXT");
+  await ensureColumnExists("heists", "timeline", "VARCHAR(500)");
+  await ensureColumnExists("heists", "crew_details", "JSON");
+  await ensureColumnExists("heists", "photos", "JSON");
+  await ensureColumnExists("heists", "short_description", "TEXT");
+
+  await pool.query(`
+    ALTER TABLE heists
+    MODIFY COLUMN payout INT NOT NULL DEFAULT 0
   `);
 
   await pool.query(`

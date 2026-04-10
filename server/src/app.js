@@ -67,7 +67,7 @@ app.get("/api", (_req, res) => {
 const apiRouter = express.Router();
 apiRouter.use("/auth", authRoutes);
 apiRouter.use("/posts", postRoutes);
-apiRouter.use("/fixer", heistRoutes);
+apiRouter.use("/heists", heistRoutes);
 
 app.use("/api", apiRouter);
 

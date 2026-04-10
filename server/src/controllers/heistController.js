@@ -3,11 +3,52 @@ const { pool } = require("../db");
 exports.postHeist = async (req, res) => {
   try {
     const fixerId = req.user.sub;
-    const { title, description, required_skills } = req.body;
+    const {
+      heading,
+      subheading,
+      quote = "",
+      timeline,
+      crew_moneyshare,
+      crew_threat_level,
+      photos,
+      short_description,
+      payout = 0,
+      required_skills,
+    } = req.body;
+
+    const title = heading;
+    const descriptionParts = [
+      `Subheading: ${subheading}`,
+      quote ? `Quote: ${quote}` : null,
+      `Timeline: ${timeline}`,
+      `Crew: Moneyshare ${crew_moneyshare}, Threat Level ${crew_threat_level}`,
+      `Short Description: ${short_description}`,
+    ].filter(Boolean);
+    const description = descriptionParts.join("\n");
+    const crewDetails = {
+      moneyshare: crew_moneyshare,
+      threat_level: crew_threat_level,
+    };
 
     const [result] = await pool.query(
-      "INSERT INTO heists (fixer_id, title, description, required_skills, status) VALUES (?, ?, ?, ?, ?)",
-      [fixerId, title, description, JSON.stringify(required_skills), "open"]
+      `INSERT INTO heists 
+      (fixer_id, title, description, payout, required_skills, heading, subheading, quote, timeline, crew_details, photos, short_description, status) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        fixerId,
+        title,
+        description,
+        payout,
+        JSON.stringify(required_skills),
+        heading,
+        subheading,
+        quote || null,
+        timeline,
+        JSON.stringify(crewDetails),
+        JSON.stringify(photos),
+        short_description,
+        "open",
+      ]
     );
 
     return res.status(201).json({
@@ -25,13 +66,30 @@ exports.getMyHeists = async (req, res) => {
     const fixerId = req.user.sub;
 
     const [heists] = await pool.query(
-      "SELECT id, title, description, required_skills, status, created_at FROM heists WHERE fixer_id = ? ORDER BY created_at DESC",
+      `SELECT 
+        id, title, description, payout, required_skills, heading, subheading, quote, timeline, crew_details, photos, short_description, status, created_at 
+      FROM heists 
+      WHERE fixer_id = ? 
+      ORDER BY created_at DESC`,
       [fixerId]
     );
 
+    const parseMaybeJson = (value, fallback) => {
+      if (value == null) return fallback;
+      if (typeof value === "object") return value;
+      if (typeof value !== "string") return fallback;
+      try {
+        return JSON.parse(value);
+      } catch {
+        return fallback;
+      }
+    };
+
     const parsed = heists.map((h) => ({
       ...h,
-      required_skills: JSON.parse(h.required_skills),
+      required_skills: parseMaybeJson(h.required_skills, []),
+      crew_details: parseMaybeJson(h.crew_details, null),
+      photos: parseMaybeJson(h.photos, []),
     }));
 
     return res.json({ heists: parsed });
