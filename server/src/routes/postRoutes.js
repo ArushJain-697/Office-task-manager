@@ -2,11 +2,11 @@ const express = require("express");
 const router = express.Router();
 
 const { requireAuth } = require("../middleware/auth");
-const upload = require("../middleware/upload"); // Apna naya bouncer
-const postController = require("../controllers/postController");
+const upload = require("../middleware/upload");
+const { createPost, getFeed, toggleLike } = require("../controllers/postController");
 
-// DHYAN DE: upload.single("image") likha hai. 
-// Frontend/Postman me photo bhejte time key ka naam "image" hona chahiye!
-router.post("/add", requireAuth, upload.single("image"), postController.createPost);
+router.get("/", requireAuth, getFeed);
+router.post("/add", requireAuth, upload.single("image"), createPost);
+router.post("/:id/like", requireAuth, toggleLike);
 
 module.exports = router;
