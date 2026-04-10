@@ -20,6 +20,16 @@ async function initDatabase() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS newspaper_posts (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      author_id INT NOT NULL,
+      content TEXT NOT NULL,
+      image_url VARCHAR(255),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
 }
 
 module.exports = {

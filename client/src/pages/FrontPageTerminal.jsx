@@ -3,6 +3,7 @@ import Typed from "typed.js";
 import "../styles/FrontPageTerminal.css";
 import { useNavigate } from "react-router-dom";
 import CinematicPage from "../components/CinematicPage";
+
 export default function FrontPageTerminal() {
   const navigate = useNavigate();
   const el = useRef(null);
@@ -145,11 +146,12 @@ export default function FrontPageTerminal() {
         setIsProcessingInput(true);
 
         startTypedAnimation(["<br/>VERIFYING... ^800 "]);
-        fetch(`${apiBaseUrl}/api/login`, {
+
+        // 
+        fetch(`${apiBaseUrl}/api/auth/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-edge":"665455db9da6a53d0a3637a9fd9118a1cda2de88972ab3a78934a34490536636"
           },
           credentials: "include", // REQUIRES COOKIES
           body: JSON.stringify({
@@ -160,7 +162,8 @@ export default function FrontPageTerminal() {
           .then(async (response) => {
             const data = await response.json();
             if (!response.ok) {
-              throw new Error(data?.message || "Login failed");
+              // Check for data.error from Syndicate Edge Guard, or data.message
+              throw new Error(data?.error || data?.message || "Login failed");
             }
             return data;
           })
@@ -191,7 +194,7 @@ export default function FrontPageTerminal() {
         ]);
         setIsProcessingInput(false);
       } else if (currentStep === "PASS_signup") {
-        // Sign Up Flow: Password entered, call the API
+
         setTerminalHistory((prev) => [...prev, `> ENTER PASSWORD: ********`]);
         const password = input;
         setUserInput("");
@@ -199,12 +202,10 @@ export default function FrontPageTerminal() {
 
         startTypedAnimation(["<br/>CREATING IDENTITY... ^800 "]);
 
-        fetch(`${apiBaseUrl}/api/register`, {
+        fetch(`${apiBaseUrl}/api/auth/register`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-edge":"665455db9da6a53d0a3637a9fd9118a1cda2de88972ab3a78934a34490536636"
-
           },
           credentials: "include", // REQUIRES COOKIES
           // This is the data he is sending to your backend
@@ -216,15 +217,14 @@ export default function FrontPageTerminal() {
           .then(async (response) => {
             const data = await response.json();
             if (!response.ok) {
-              // This will catch "Username already in use"
+              // This will catch Edge Guard 'error' or authController 'message'
               throw new Error(
-                data?.message || `Registration failed: ${response.status}`,
+                data?.error || data?.message || `Registration failed: ${response.status}`,
               );
             }
             return data;
           })
           .then((data) => {
-            // SUCCESS! The cookie is set, and we can log the user in.
             startTypedAnimation(
               [
                 `<br/>REGISTRATION COMPLETE. Welcome, ^500${data.user.username}`,
