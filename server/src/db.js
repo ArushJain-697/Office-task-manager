@@ -46,20 +46,40 @@ async function initDatabase() {
     )
   `);
 
-  // ==========================================
-  // 💣 NAYI TABLE: HEISTS (Jobs posted by Fixers)
-  // ==========================================
   await pool.query(`
     CREATE TABLE IF NOT EXISTS heists (
       id INT AUTO_INCREMENT PRIMARY KEY,
       fixer_id INT NOT NULL,
-      title VARCHAR(255) NOT NULL,
+      title VARCHAR(200) NOT NULL,
       description TEXT NOT NULL,
-      payout INT NOT NULL,
-      required_skills JSON,
-      status VARCHAR(50) DEFAULT 'OPEN',
+      required_skills JSON NOT NULL,
+      status VARCHAR(50) DEFAULT 'open',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (fixer_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS sicario_profiles (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL UNIQUE,
+      bio TEXT,
+      skills JSON,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS applications (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      heist_id INT NOT NULL,
+      sicario_id INT NOT NULL,
+      fit_score INT DEFAULT 0,
+      status VARCHAR(50) DEFAULT 'pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE KEY unique_application (heist_id, sicario_id),
+      FOREIGN KEY (heist_id) REFERENCES heists(id) ON DELETE CASCADE,
+      FOREIGN KEY (sicario_id) REFERENCES users(id) ON DELETE CASCADE
     )
   `);
 }
