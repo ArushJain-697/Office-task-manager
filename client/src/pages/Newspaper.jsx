@@ -5,6 +5,7 @@ import CinematicPage from "../components/CinematicPage";
 import "../scripts/fittext.js";
 import EvidenceGun from "../components/EvidenceGun.jsx";
 import LoadingScreen from "../components/LoadingScreen.jsx";
+import WantedPoster from "../components/WantedPoster.jsx";
 // 1. MOVED OUTSIDE: This prevents React from destroying the pages on every click!
 const Page = React.forwardRef((props, ref) => {
   return props.front === false ? (
@@ -43,7 +44,7 @@ export default function Newspaper() {
 
   return (
     <CinematicPage>
-      <LoadingScreen />
+      {/* <LoadingScreen /> */}
 
       <div className=" bgTable bg-[url('/assets/table.png')] fixed inset-0 flex justify-center items-center bg-cover overflow-hidden">
         {/* 1. DARK OVERLAY */}
@@ -74,7 +75,7 @@ export default function Newspaper() {
           }}
         >
           <img
-            src="/assets/frontPageBG.png"
+            src="/assets/frontPageBG.jpeg"
             className="hover:border-8 p-2 border-amber-300 max-w-[35vw] z-20"
             alt="newspaper-folded"
           />
@@ -121,20 +122,24 @@ export default function Newspaper() {
           src="/assets/wanted.jpeg"
           alt="wanted image"
           draggable={false}
-          className="absolute right-20 z-19 top-15 rotate-160 max-w-30 p-1 hover:border-2 border-amber-300 hover:scale-110s box-content "
+          className="absolute right-20 z-19 top-15 rotate-20 max-w-50 p-1 hover:border-2 border-amber-300 hover:scale-110s box-content "
         />
         <img
+          src="/assets/MagnifyingGlass.png"
+          alt="Search"
+          draggable={false}
+          className="magGlass absolute right-20 z-19 bottom-15 rotate-130 max-w-50 box-content "
+        />
+
+        <img
           src="/assets/bullets.png"
-          onMouseOver={e => (e.currentTarget.src = "/assets/bulletsHover.png")}
-          onMouseOut={e => (e.currentTarget.src = "/assets/bullets.png")}
           alt="wanted image"
           draggable={false}
-          className="absolute left-20 z-19 bottom-15 rotate-160 max-w-50 p-1 box-content "
+          className="bullets absolute left-20 z-19 bottom-15 rotate-160 max-w-50 p-1 box-content "
         />
         <EvidenceGun />
       </div>
     </CinematicPage>
-
   );
 }
 
@@ -153,12 +158,13 @@ function SinglePage() {
           <p className="newsContent text-justify">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
             numquam quaerat ipsa commodi earum optio quia ut, quis distinctio
-            pariatur cumque ameterat ipsa commodi earum optio quia ut, quis distinctio
-            pariatur cumque ameterat ipsa commodi earum optio quia ut, quis distinctio
-            pariatur cumque ameterat ipsa commodi earum optio quia ut, quis distinctio
-            pariatur cumque ameterat ipsa commodi earum optio quia ut, quis distinctio
-            pariatur cumque amet vitae dolore non nobis. Atque numquam nihil
-            facere vitae quis aliquid incidunt quia, voluptas sequi.
+            pariatur cumque ameterat ipsa commodi earum optio quia ut, quis
+            distinctio pariatur cumque ameterat ipsa commodi earum optio quia
+            ut, quis distinctio pariatur cumque ameterat ipsa commodi earum
+            optio quia ut, quis distinctio pariatur cumque ameterat ipsa commodi
+            earum optio quia ut, quis distinctio pariatur cumque amet vitae
+            dolore non nobis. Atque numquam nihil facere vitae quis aliquid
+            incidunt quia, voluptas sequi.
           </p>
         </div>
         <div className="col2">
@@ -171,12 +177,13 @@ function SinglePage() {
           <p className="newsContent text-justify">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
             numquam quaerat ipsa commodi earum optio quia ut, quis distinctio
-            pariatur cumque ameterat ipsa commodi earum optio quia ut, quis distinctio
-            pariatur cumque ameterat ipsa commodi earum optio quia ut, quis distinctio
-            pariatur cumque ameterat ipsa commodi earum optio quia ut, quis distinctio
-            pariatur cumque ameterat ipsa commodi earum optio quia ut, quis distinctio
-            pariatur cumque amet vitae dolore non nobis. Atque numquam nihil
-            facere vitae quis aliquid incidunt quia, voluptas sequi.
+            pariatur cumque ameterat ipsa commodi earum optio quia ut, quis
+            distinctio pariatur cumque ameterat ipsa commodi earum optio quia
+            ut, quis distinctio pariatur cumque ameterat ipsa commodi earum
+            optio quia ut, quis distinctio pariatur cumque ameterat ipsa commodi
+            earum optio quia ut, quis distinctio pariatur cumque amet vitae
+            dolore non nobis. Atque numquam nihil facere vitae quis aliquid
+            incidunt quia, voluptas sequi.
           </p>
         </div>
       </div>
@@ -221,11 +228,10 @@ function FrontPage() {
               <div className="advertisement w-full border-2 p-0 mt-1 flex items-center justify-center">
                   <img src="/assets/advert.svg" alt="advertisement for front page" className=" m-0 w-[80%]" />hi
               </div>
-            </div>
           </div>
         </div>
       </div>
-      {/* <img src="/assets/frontPageBG.png" alt="front page" className="w-[90%]" /> */}
+    </div>
     </div>
   );
 }

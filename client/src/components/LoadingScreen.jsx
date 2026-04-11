@@ -11,7 +11,7 @@ export default function LoadingScreen() {
     // Make sure these match your exact file paths!
     const imageUrls = [
       "/assets/table.png",
-      "/assets/frontPageBG.png", 
+      "/assets/frontPageBG.jpeg",
       "/assets/wanted.jpeg"
     ];
 
@@ -44,7 +44,7 @@ export default function LoadingScreen() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="fixed inset-0 z-[999] bg-[#0a0a0a] flex flex-col items-center justify-center text-[#00FF41] font-mono"
+          className="fixed inset-0 z-999 bg-[#0a0a0a] flex flex-col items-center justify-center text-[#00FF41] font-mono"
         >
           {/* CRT Scanline Effect Overlay */}
           <div className="absolute inset-0 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>

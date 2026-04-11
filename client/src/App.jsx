@@ -9,7 +9,7 @@ import {
 import FrontPageTerminal from "./pages/FrontPageTerminal";
 import Newspaper from "./pages/Newspaper";
 import { motion, AnimatePresence } from 'framer-motion';
-import Transition from "./components/Transition"
+import WantedPoster from "./components/WantedPoster";
 const App = () => {
     const location = useLocation();
     const currentPath = location?.pathname || "/";
@@ -42,6 +42,7 @@ const BlackFlash = ({ isNavigating }) => {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<FrontPageTerminal />} />
           <Route path="/feed" element={<Newspaper />} />
+          <Route path="/working" element={<WantedPoster />} />
         </Routes>
       </AnimatePresence>
 
