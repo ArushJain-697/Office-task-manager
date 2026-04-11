@@ -70,14 +70,9 @@ exports.updateProfile = async (req, res) => {
     if (existing.length > 0) {
       const updatePhoto = photo_url ? ", photo_url = ?, photo_public_id = ?" : "";
       const params = [
-        name ?? null,
-        title ?? null,
-        height ?? null,
-        weight ?? null,
+        name ?? null, title ?? null, height ?? null, weight ?? null,
         JSON.stringify(languages ?? []),
-        blood_group ?? null,
-        clearance_level ?? null,
-        about ?? null,
+        blood_group ?? null, clearance_level ?? null, about ?? null,
         JSON.stringify(skills ?? []),
         ...(photo_url ? [photo_url, photo_public_id] : []),
         userId,
@@ -111,6 +106,38 @@ exports.updateProfile = async (req, res) => {
     return res.json({ message: "Profile updated successfully." });
   } catch (error) {
     console.error("Error updating profile:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getHeists = async (req, res) => {
+  try {
+    const [heists] = await pool.query(
+      `SELECT 
+        id, heading, subheading, quote, timeline,
+        payout, required_skills, crew_details,
+        photos, short_description, status, created_at
+       FROM heists
+       WHERE status = 'open'
+       ORDER BY created_at DESC`
+    );
+
+    const parseMaybeJson = (value, fallback) => {
+      if (value == null) return fallback;
+      if (typeof value === "object") return value;
+      try { return JSON.parse(value); } catch { return fallback; }
+    };
+
+    const parsed = heists.map((h) => ({
+      ...h,
+      required_skills: parseMaybeJson(h.required_skills, []),
+      crew_details: parseMaybeJson(h.crew_details, null),
+      photos: parseMaybeJson(h.photos, []),
+    }));
+
+    return res.json({ heists: parsed });
+  } catch (error) {
+    console.error("Error fetching heists:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
