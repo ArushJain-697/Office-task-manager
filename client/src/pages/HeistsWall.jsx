@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { FreeMode, Mousewheel } from 'swiper/modules';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { FreeMode, Mousewheel } from "swiper/modules";
 
-import 'swiper/css';
-import 'swiper/css/free-mode';
+import "swiper/css";
+import "swiper/css/free-mode";
 
 const originalImages = [
   // [object Object]
@@ -50,13 +50,16 @@ const originalImages = [
   },
 ];
 
+const infiniteImages = [
+  ...originalImages,
+  ...originalImages,
+  ...originalImages,
+];
 
-const infiniteImages = [...originalImages, ...originalImages, ...originalImages];
-
-const linearTransition = { 
-  type: "tween", 
-  ease: "linear", 
-  duration: 0.35 
+const linearTransition = {
+  type: "tween",
+  ease: "linear",
+  duration: 0.35,
 };
 
 const HorizontalGallery = () => {
@@ -64,49 +67,49 @@ const HorizontalGallery = () => {
 
   return (
     <div className="relative w-full h-[100dvh] overflow-hidden bg-[#050505] flex items-center justify-center">
-
-      <div 
+      <div
         className="absolute inset-0 z-0 pointer-events-none"
-        style={{ backgroundColor: '#050505' }}
+        style={{ backgroundColor: "#050505" }}
       />
 
       <Swiper
         modules={[FreeMode, Mousewheel]}
-        mousewheel={{ 
-          enabled: true, 
+        mousewheel={{
+          enabled: true,
           sensitivity: 0.4,
-          releaseOnEdges: true 
+          releaseOnEdges: true,
         }}
         freeMode={{ enabled: true, sticky: false, momentumRatio: 0.5 }}
         loop={true}
-        centeredSlides={true} 
+        centeredSlides={true}
         grabCursor={true}
-        slidesPerView="auto" 
-        className="w-full h-full z-10" 
+        slidesPerView="auto"
+        className="w-full h-full z-10"
       >
         {infiniteImages.map((img, index) => (
-          <SwiperSlide key={index} className="!w-auto h-full !flex justify-center items-center px-[5vw]">
-            
+          <SwiperSlide
+            key={index}
+            className="!w-auto h-full !flex justify-center items-center px-[5vw]"
+          >
             {/* PERFORMANCE FIX 1: 
                 Added 'transform-gpu', 'will-change-transform', and 'backface-hidden' 
                 This forces the browser to composite each of these groups on its own dedicated GPU layer, preventing layout thrashing. */}
-            <div 
+            <div
               className="relative h-[40vh] w-fit flex-shrink-0 cursor-pointer group transform-gpu will-change-transform backface-hidden"
               onClick={() => setSelectedImage({ ...img, uniqueIndex: index })}
             >
-              
               {/* PERFORMANCE FIX 2: 
                   Shrunk w-[150vw] to w-[100vw] and h-[150vh] to h-[100vh].
                   This stops the browser from calculating millions of invisible pixels off-screen. */}
-              <div 
+              <div
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[100vh] pointer-events-none -z-10"
-                style={{ 
+                style={{
                   backgroundImage: "url('/assets/StoneTexture.png')",
-                  backgroundSize: "15rem", 
+                  backgroundSize: "15rem",
                   backgroundRepeat: "repeat",
                   backgroundPosition: "center",
-                  
-                   WebkitMaskImage:
+
+                  WebkitMaskImage:
                     "linear-gradient(to bottom, black 20%, transparent 80%), radial-gradient(ellipse 20vw 30vh at 50% 35%, black 0%, transparent 70%), conic-gradient(from 140deg at 50% 32%, transparent 0deg, black 20deg, black 60deg, transparent 100deg)",
 
                   // MAGIC: 'source-over' glues the bulb and beam together. 'source-in' fades the glued result!
@@ -116,7 +119,7 @@ const HorizontalGallery = () => {
                   maskImage:
                     "linear-gradient(to bottom, black 20%, transparent 80%), radial-gradient(ellipse 15vw 20vh at 50% 35%, black 0%, transparent 70%), conic-gradient(from 140deg at 50% 32%, transparent 0deg, black 20deg, black 60deg, transparent 100deg)",
                   maskComposite: "intersect, add",
-                }} 
+                }}
               />
 
               <img
@@ -136,18 +139,17 @@ const HorizontalGallery = () => {
                            shadow-[0_1rem_3rem_rgba(0,0,0,1)] transition-transform duration-300 group-hover:scale-105"
               />
 
-              <div 
-                className={`absolute inset-0 z-30 pointer-events-none transition-all duration-300 group-hover:scale-105 border-[0.5rem] border-transparent bg-clip-padding rounded-sm bg-gradient-to-b from-transparent via-black/40 to-black/90 ${selectedImage?.uniqueIndex === index ? 'opacity-0' : 'opacity-100'}`}
+              <div
+                className={`absolute inset-0 z-30 pointer-events-none transition-all duration-300 group-hover:scale-105 border-[0.5rem] border-transparent bg-clip-padding rounded-sm bg-gradient-to-b from-transparent via-black/40 to-black/90 ${selectedImage?.uniqueIndex === index ? "opacity-0" : "opacity-100"}`}
               />
             </div>
-
           </SwiperSlide>
         ))}
       </Swiper>
 
       <AnimatePresence>
         {selectedImage && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -164,8 +166,8 @@ const HorizontalGallery = () => {
                 className="max-h-[85vh] max-w-[90vw] w-auto h-auto object-cover border-[0.75rem] border-[#111] rounded-sm shadow-[0_0_5rem_rgba(0,0,0,1)] cursor-default will-change-transform"
                 onClick={(e) => e.stopPropagation()}
               />
-              
-              <motion.p 
+
+              <motion.p
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
