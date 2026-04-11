@@ -1,5 +1,6 @@
 const { pool } = require("../db");
 const { uploadToCloudinary } = require("../utils/cloudinary");
+const { sanitizeObject } = require("../utils/sanitize");
 
 exports.getProfile = async (req, res) => {
   try {
@@ -43,10 +44,11 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user.sub;
+    const clean = sanitizeObject(req.body);
     const {
       name, title, height, weight,
       languages, blood_group, clearance_level, about, skills,
-    } = req.body;
+    } = clean;
 
     let photo_url = null;
     let photo_public_id = null;
@@ -236,7 +238,6 @@ exports.getMyApplications = async (req, res) => {
       `SELECT
         a.id AS application_id,
         a.status,
-        a.fit_score,
         a.created_at,
         h.id AS heist_id,
         h.heading,

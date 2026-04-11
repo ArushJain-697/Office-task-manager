@@ -1,13 +1,15 @@
 const { pool } = require("../db");
 const { uploadToCloudinary } = require("../utils/cloudinary");
+const { sanitizeObject } = require("../utils/sanitize");
 
 exports.postHeist = async (req, res) => {
   try {
     const fixerId = req.user.sub;
+    const clean = sanitizeObject(req.body);
     const {
       heading, subheading, quote = "", timeline,
       crew_threat_level, short_description, payout = 0, required_skills,
-    } = req.body;
+    } = clean;
 
     let photos = [];
     if (req.files && req.files.length > 0) {
@@ -101,25 +103,25 @@ exports.getApplicants = async (req, res) => {
     }
 
     const [applicants] = await pool.query(`
-  SELECT 
-    a.id AS application_id,
-    a.fit_score,
-    a.status,
-    a.created_at,
-    u.id AS sicario_id,
-    u.username,
-    sp.name,
-    sp.title,
-    sp.about AS bio,
-    sp.skills,
-    sp.clearance_level,
-    sp.photo_url
-  FROM applications a
-  JOIN users u ON a.sicario_id = u.id
-  LEFT JOIN sicario_profiles sp ON sp.user_id = u.id
-  WHERE a.heist_id = ?
-  ORDER BY a.fit_score DESC
-`, [heistId]);
+      SELECT 
+        a.id AS application_id,
+        a.fit_score,
+        a.status,
+        a.created_at,
+        u.id AS sicario_id,
+        u.username,
+        sp.name,
+        sp.title,
+        sp.about AS bio,
+        sp.skills,
+        sp.clearance_level,
+        sp.photo_url
+      FROM applications a
+      JOIN users u ON a.sicario_id = u.id
+      LEFT JOIN sicario_profiles sp ON sp.user_id = u.id
+      WHERE a.heist_id = ?
+      ORDER BY a.fit_score DESC
+    `, [heistId]);
 
     const parsed = applicants.map((a) => ({
       ...a,

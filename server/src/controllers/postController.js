@@ -1,5 +1,6 @@
 const { pool } = require("../db");
 const { uploadToCloudinary } = require("../utils/cloudinary");
+const { sanitize } = require("../utils/sanitize");
 
 exports.createPost = async (req, res) => {
   try {
@@ -13,6 +14,9 @@ exports.createPost = async (req, res) => {
     if (!content || content.trim() === "") {
       return res.status(400).json({ message: "Content cannot be empty." });
     }
+
+    const cleanTitle = title ? sanitize(title.trim()) : null;
+    const cleanContent = sanitize(content.trim());
 
     let image_url = null;
     let image_public_id = null;
@@ -30,7 +34,7 @@ exports.createPost = async (req, res) => {
 
     const [result] = await pool.query(
       "INSERT INTO newspaper_posts (author_id, title, content, image_url, image_public_id) VALUES (?, ?, ?, ?, ?)",
-      [authorId, title?.trim() ?? null, content.trim(), image_url, image_public_id]
+      [authorId, cleanTitle, cleanContent, image_url, image_public_id]
     );
 
     return res.status(201).json({
