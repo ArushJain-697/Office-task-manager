@@ -32,18 +32,7 @@ exports.postHeist = async (req, res) => {
       }
     }
 
-    const title = heading;
-    const description = [
-      `Subheading: ${subheading}`,
-      quote ? `Quote: ${quote}` : null,
-      `Timeline: ${timeline}`,
-      `Threat Level: ${crew_threat_level}`,
-      `Short Description: ${short_description}`,
-    ].filter(Boolean).join("\n");
-
-    const crewDetails = {
-      threat_level: crew_threat_level,
-    };
+    const crewDetails = { threat_level: crew_threat_level };
 
     const [result] = await pool.query(
       `INSERT INTO heists 
@@ -51,8 +40,8 @@ exports.postHeist = async (req, res) => {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         fixerId,
-        title,
-        description,
+        heading,
+        short_description, // description column mein short_description daalo — clean
         payout,
         JSON.stringify(required_skills),
         heading,
@@ -83,8 +72,9 @@ exports.getMyHeists = async (req, res) => {
 
     const [heists] = await pool.query(
       `SELECT 
-        id, title, description, payout, required_skills, heading, subheading, 
-        quote, timeline, crew_details, photos, short_description, status, created_at 
+        id, heading, subheading, quote, timeline, 
+        payout, required_skills, crew_details, 
+        photos, short_description, status, created_at 
        FROM heists 
        WHERE fixer_id = ? 
        ORDER BY created_at DESC`,
