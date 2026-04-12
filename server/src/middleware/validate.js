@@ -42,33 +42,59 @@ function validateLoginCredentials(req, res, next) {
   return next();
 }
 
+const timelineStepSchema = z.object({
+  step: z.coerce.number().int().min(1).max(6),
+  time: z.string().trim().min(1).max(20),
+  desc: z.string().trim().min(1).max(500),
+});
+
+const crewMemberSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  job: z.string().trim().min(1).max(200),
+  requirements: z.string().trim().min(1).max(200),
+  threat_level: z.string().trim().min(1).max(100),
+  money_share: z.string().trim().min(1).max(50),
+});
+
 const heistSchema = z.object({
-  heading: z.string().trim().min(3).max(200),
-  subheading: z.string().trim().min(3).max(200),
+  // Section A — Mission Overview
+  operation_name: z.string().trim().min(3).max(200),
+  place: z.string().trim().min(1).max(200),
+  target: z.string().trim().min(1).max(200),
+  introduction: z.string().trim().min(10).max(3000),
   quote: z.string().trim().max(500).optional().or(z.literal("")),
-  timeline: z.string().trim().min(3).max(500),
-  crew_threat_level: z.string().trim().min(1).max(100),
-  short_description: z.string().trim().min(10).max(2000),
-  payout: z.coerce.number().int().nonnegative().default(0),
-  required_skills: z.array(
-    z.object({
-      role: z.string().trim().min(1).max(100),
-      moneyshare: z.string().trim().min(1).max(50),
-    })
-  ).min(1),
+
+  // Section B — Reconnaissance
+  phase1_name: z.string().trim().min(1).max(200),
+  phase1_description: z.string().trim().min(1).max(2000),
+  intel_end_points_mapped: z.string().trim().min(1).max(500),
+  intel_guard_rotations: z.string().trim().min(1).max(500),
+  intel_surveillance_hours: z.string().trim().min(1).max(500),
+  intel_vulnerabilities_found: z.string().trim().min(1).max(500),
+
+  // Section C: Execution
+  execution_description: z.string().trim().min(1).max(3000),
+  // Section C: Timeline
+  timeline: z.array(timelineStepSchema).length(6),
+
+  // Section D — Extraction
+  extraction_plan: z.string().trim().min(1).max(3000),
+
+  // Section E — Crew Manifest
+  crew_members: z.array(crewMemberSchema).min(1),
 });
 
 function validateHeist(req, res, next) {
-  if (typeof req.body.required_skills === "string") {
-    try {
-      req.body.required_skills = JSON.parse(req.body.required_skills);
-    } catch {
-      return res.status(400).json({ message: "required_skills must be a valid JSON array" });
+  // Parse JSON strings sent via form-data
+  ["timeline", "crew_members"].forEach((key) => {
+    if (typeof req.body[key] === "string") {
+      try {
+        req.body[key] = JSON.parse(req.body[key]);
+      } catch {
+        return res.status(400).json({ message: `${key} must be a valid JSON array` });
+      }
     }
-  }
-  if (typeof req.body.payout === "string") {
-    req.body.payout = Number(req.body.payout);
-  }
+  });
 
   const parsed = heistSchema.safeParse(req.body);
   if (!parsed.success) {

@@ -2,6 +2,12 @@ const { pool } = require("../db");
 const { uploadToCloudinary } = require("../utils/cloudinary");
 const { sanitizeObject } = require("../utils/sanitize");
 
+const parseMaybeJson = (value, fallback) => {
+  if (value == null) return fallback;
+  if (typeof value === "object") return value;
+  try { return JSON.parse(value); } catch { return fallback; }
+};
+
 exports.getProfile = async (req, res) => {
   try {
     const userId = req.user.sub;
@@ -28,11 +34,6 @@ exports.getProfile = async (req, res) => {
     );
 
     const profile = rows[0];
-    const parseMaybeJson = (val, fallback) => {
-      if (val == null) return fallback;
-      if (typeof val === "object") return val;
-      try { return JSON.parse(val); } catch { return fallback; }
-    };
 
     return res.json({
       profile: {
@@ -128,45 +129,77 @@ exports.getHeists = async (req, res) => {
       [userId]
     );
 
-    const parseMaybeJson = (value, fallback) => {
-      if (value == null) return fallback;
-      if (typeof value === "object") return value;
-      try { return JSON.parse(value); } catch { return fallback; }
-    };
-
     const rawSkills = profileRows.length > 0 ? parseMaybeJson(profileRows[0].skills, []) : [];
     const sicarioSkills = rawSkills.map((s) => s.toLowerCase());
 
     const [heists] = await pool.query(
       `SELECT 
-        id, heading, subheading, quote, timeline,
-        payout, required_skills, crew_details,
-        photos, short_description, status, created_at
+        id, status, created_at,
+        operation_name, place, target, introduction, quote,
+        phase1_name, phase1_description, phase1_photo_url,
+        intel,
+        execution_description, execution_photo_url,
+        timeline,
+        extraction_plan, extraction_photo_url,
+        crew_members
        FROM heists
        WHERE status = 'open'`
     );
 
     const scored = heists
       .map((h) => {
-        const requiredSkills = parseMaybeJson(h.required_skills, []);
-        const requiredRoles = requiredSkills.map((s) => s.role?.toLowerCase()).filter(Boolean);
+        const intel = parseMaybeJson(h.intel, {});
+        const crew_members = parseMaybeJson(h.crew_members, []);
+        const timeline = parseMaybeJson(h.timeline, []);
 
-        let fitScore = 0;
-        if (requiredRoles.length > 0) {
-          const matched = requiredRoles.filter((role) => sicarioSkills.includes(role)).length;
-          fitScore = Math.round((matched / requiredRoles.length) * 100);
+        const requiredJobs = crew_members
+          .map((m) => m.requirements?.toLowerCase())
+          .filter(Boolean);
+
+        let fit_score = 0;
+        if (requiredJobs.length > 0) {
+          const matched = requiredJobs.filter((job) => sicarioSkills.includes(job)).length;
+          fit_score = Math.round((matched / requiredJobs.length) * 100);
         }
 
         return {
-          ...h,
-          required_skills: requiredSkills,
-          crew_details: parseMaybeJson(h.crew_details, null),
-          photos: parseMaybeJson(h.photos, []),
-          _fitScore: fitScore,
+          id: h.id,
+          status: h.status,
+          created_at: h.created_at,
+          fit_score,
+          section_a: {
+            operation_name: h.operation_name,
+            place: h.place,
+            target: h.target,
+            introduction: h.introduction,
+            quote: h.quote,
+          },
+          section_b: {
+            phase1_name: h.phase1_name,
+            phase1_description: h.phase1_description,
+            phase1_photo_url: h.phase1_photo_url,
+            intel: {
+              end_points_mapped: intel.end_points_mapped,
+              guard_rotations: intel.guard_rotations,
+              surveillance_hours: intel.surveillance_hours,
+              vulnerabilities_found: intel.vulnerabilities_found,
+            },
+          },
+          section_c: {
+            execution_description: h.execution_description,
+            execution_photo_url: h.execution_photo_url,
+            timeline,
+          },
+          section_d: {
+            extraction_plan: h.extraction_plan,
+            extraction_photo_url: h.extraction_photo_url,
+          },
+          section_e: {
+            crew_members,
+          },
         };
       })
-      .sort((a, b) => b._fitScore - a._fitScore)
-      .map(({ _fitScore, ...heist }) => heist);
+      .sort((a, b) => b.fit_score - a.fit_score);
 
     return res.json({ heists: scored });
   } catch (error) {
@@ -185,7 +218,7 @@ exports.applyToHeist = async (req, res) => {
     }
 
     const [heistRows] = await pool.query(
-      "SELECT id, required_skills FROM heists WHERE id = ? AND status = 'open' LIMIT 1",
+      "SELECT id, crew_members FROM heists WHERE id = ? AND status = 'open' LIMIT 1",
       [heistId]
     );
     if (heistRows.length === 0) {
@@ -200,12 +233,6 @@ exports.applyToHeist = async (req, res) => {
       return res.status(409).json({ message: "Already applied to this heist." });
     }
 
-    const parseMaybeJson = (value, fallback) => {
-      if (value == null) return fallback;
-      if (typeof value === "object") return value;
-      try { return JSON.parse(value); } catch { return fallback; }
-    };
-
     const [profileRows] = await pool.query(
       "SELECT skills FROM sicario_profiles WHERE user_id = ? LIMIT 1",
       [sicarioId]
@@ -213,18 +240,20 @@ exports.applyToHeist = async (req, res) => {
     const rawSkills = profileRows.length > 0 ? parseMaybeJson(profileRows[0].skills, []) : [];
     const sicarioSkills = rawSkills.map((s) => s.toLowerCase());
 
-    const requiredSkills = parseMaybeJson(heistRows[0].required_skills, []);
-    const requiredRoles = requiredSkills.map((s) => s.role?.toLowerCase()).filter(Boolean);
+    const crewMembers = parseMaybeJson(heistRows[0].crew_members, []);
+    const requiredJobs = crewMembers
+      .map((m) => m.requirements?.toLowerCase())
+      .filter(Boolean);
 
     let fitScore = 0;
-    if (requiredRoles.length > 0) {
-      const matched = requiredRoles.filter((role) => sicarioSkills.includes(role)).length;
-      fitScore = Math.round((matched / requiredRoles.length) * 100);
+    if (requiredJobs.length > 0) {
+      const matched = requiredJobs.filter((job) => sicarioSkills.includes(job)).length;
+      fitScore = Math.round((matched / requiredJobs.length) * 100);
     }
 
     const [result] = await pool.query(
-      "INSERT INTO applications (heist_id, sicario_id, fit_score, status) VALUES (?, ?, ?, ?)",
-      [heistId, sicarioId, fitScore, "pending"]
+      "INSERT INTO applications (heist_id, sicario_id, fit_score, status) VALUES (?, ?, ?, 'pending')",
+      [heistId, sicarioId, fitScore]
     );
 
     return res.status(201).json({
@@ -247,10 +276,9 @@ exports.getMyApplications = async (req, res) => {
         a.status,
         a.created_at,
         h.id AS heist_id,
-        h.heading,
-        h.subheading,
-        h.payout,
-        h.timeline,
+        h.operation_name,
+        h.place,
+        h.target,
         h.status AS heist_status
        FROM applications a
        JOIN heists h ON a.heist_id = h.id
