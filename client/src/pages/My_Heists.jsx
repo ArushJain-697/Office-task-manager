@@ -1,41 +1,57 @@
 import React, { useEffect, useState } from "react";
-import HeistCard from "../components/HeistCard";
+import HackNiteCard from "../components/HackNiteCard";
+
+const APPLICATIONS_URL = "https://api.sicari.works/api/sicario/applications";
+
+function applicationToCardProps(app) {
+  const subheading = app.subheading ?? "";
+  const payout = app.payout;
+  const payoutLine =
+    payout != null && payout !== ""
+      ? `# ${typeof payout === "number" ? payout.toLocaleString() : String(payout)}`
+      : "# —";
+  const status = app.status ?? "";
+
+  return {
+    title: app.heading ?? "Untitled",
+    hashtagLines: [
+      subheading ? `# ${subheading}` : "# —",
+      payoutLine,
+      status ? `# ${status}` : "# —",
+    ],
+  };
+}
 
 const MyHeists = () => {
-  const [heists, setHeists] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const sampleData = [
-      {
-        application_id: 1,
-        status: "accepted",
-        created_at: "2026-04-11T10:00:00.000Z",
-        heading: "Casino Royale",
-        subheading: "High stakes job",
-        payout: 50000,
-        timeline: "3 din",
-        heist_status: "open",
-      },
-    ];
+    let cancelled = false;
 
-    fetch("https://api.sicari.works/api/my_applications", {
-      credentials: "include",
-    })
-      .then((res) => res.json())
+    fetch(APPLICATIONS_URL, { credentials: "include" })
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
       .then((data) => {
-        const backendData = Array.isArray(data)
+        if (cancelled) return;
+        const list = Array.isArray(data)
           ? data
-          : data.applications || data.data || [];
-
-        setHeists([...backendData, ...sampleData]);
+          : data.applications ?? data.data ?? [];
+        setApplications(Array.isArray(list) ? list : []);
       })
-      .catch(() => setHeists(sampleData));
+      .catch(() => {
+        if (!cancelled) setApplications([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#e5e5e5] px-6 py-12">
-      
-      {/* 🔴 Bigger Title */}
       <h1
         className="text-5xl text-center mb-16 tracking-[0.25em]"
         style={{
@@ -47,17 +63,31 @@ const MyHeists = () => {
         MY HEISTS
       </h1>
 
-      {/* 🩸 Grid with proper row spacing */}
-      <div className="flex flex-wrap justify-center gap-x-12 gap-y-16">
-        {heists.map((heist, index) => (
-          <div
-            key={index}
-            className="w-[300px] aspect-[3/4] flex justify-center"
-          >
-            <HeistCard heist={heist} />
-          </div>
-        ))}
-      </div>
+      {loading ? (
+        <p className="text-center text-neutral-400">Loading…</p>
+      ) : applications.length === 0 ? (
+        <p className="text-center text-neutral-400">No applications yet.</p>
+      ) : (
+        <div className="flex flex-wrap justify-center gap-x-12 gap-y-16">
+          {applications.map((app) => {
+            const id =
+              app.application_id ??
+              app["heist id"] ??
+              app.heist_id ??
+              `${app.heading}-${app.created_at}`;
+            const { title, hashtagLines } = applicationToCardProps(app);
+            return (
+              <div
+                key={id}
+                className="flex justify-center"
+                style={{ width: 381 }}
+              >
+                <HackNiteCard title={title} hashtagLines={hashtagLines} />
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
