@@ -23,32 +23,48 @@ const HorizontalGallery = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Check user role
     fetch("https://api.sicari.works/api/auth/me", { credentials: "include" })
       .then((res) => res.json())
       .then((authData) => {
         const userRole = authData?.user?.role || "sicario";
         setRole(userRole);
-        
-        // 2. Fetch appropriate heists
-        const url = userRole === "fixer" 
-          ? "https://api.sicari.works/api/fixer/heists" 
-          : "https://api.sicari.works/api/sicario/heists";
+
+        const url =
+          userRole === "fixer"
+            ? "https://api.sicari.works/api/fixer/heists"
+            : "https://api.sicari.works/api/sicario/heists";
 
         return fetch(url, { credentials: "include" });
       })
       .then((res) => res.json())
       .then((data) => {
-        const arr = Array.isArray(data) ? data : data.heists || data.data || [];
+        const arr = Array.isArray(data)
+          ? data
+          : data.heists || data.data || [];
         setHeists(arr);
       })
       .catch((err) => console.error("Error fetching heists data:", err));
   }, []);
 
-  const infiniteHeists = heists.length > 0 ? [...heists, ...heists, ...heists] : [];
+  const infiniteHeists =
+    heists.length > 0 ? [...heists, ...heists, ...heists] : [];
 
   return (
     <CinematicPage>
+
+      {/* ✅ FIXED "MY HEISTS" BUTTON */}
+      <button
+        onClick={() => navigate("/my_heists")}
+        className="fixed top-6 right-6 z-[100] bg-[#2c1303] text-[#f0e8d0] font-['Bungee'] py-[0.6rem] px-[1.8rem] shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:scale-105 active:scale-95 transition-transform"
+        style={{
+          fontSize: 16,
+          border: "2px solid black",
+          letterSpacing: "1px",
+        }}
+      >
+        My Heists
+      </button>
+
       <div className="relative w-full h-[100dvh] overflow-hidden bg-[#050505] flex items-center justify-center">
         <div
           className="absolute inset-0 z-0 pointer-events-none"
@@ -70,18 +86,14 @@ const HorizontalGallery = () => {
           className="w-full h-full z-10"
         >
           {infiniteHeists.map((item, index) => {
-            const title = item.heading || item.title || item.name || `Heist ${index + 1}`;
-
-            const requiredSkills = (item.required_skills || []).map(
-              (skill) => `# ${skill.role.toUpperCase()} - ${skill.moneyshare}`
-            );
-
-            const hashtags = [
-              `# ${item.timeline || "Top Secret"}`,
-              ...requiredSkills,
-              `# ${item.crew_details?.threat_level || "Unknown"} Threat`,
-              item.payout ? `# Payout ${item.payout}` : "# Classified",
-            ];
+            const title =
+            item?.section_a?.operation_name || `Heist ${index + 1}`;
+          
+          // crew members → hashtags
+          const hashtags =
+            item?.section_e?.crew_members?.map(
+              (member) => `# ${member.job} ${member.money_share}`
+            ) || [];
 
             return (
               <SwiperSlide
@@ -96,54 +108,55 @@ const HorizontalGallery = () => {
                       uniqueIndex: index,
                       _title: title,
                       _hashtags: hashtags,
-                      description: item.quote || item.short_description || "",
+                      description:
+                        item.quote || item.short_description || "",
                     })
                   }
                 >
-                  {/* 1. The Masked Background */}
                   <div
                     className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[100vh] pointer-events-none z-0"
                     style={{
-                      backgroundImage: "url('/assets/StoneTexture.png')",
+                      backgroundImage:
+                        "url('/assets/StoneTexture.png')",
                       backgroundSize: "30rem",
                       backgroundRepeat: "repeat",
                       backgroundPosition: "center",
-                      // FIX 1: Massively widened the ellipse (from 20vw to 35vw) so the light bleeds around the wide cards!
-                      WebkitMaskImage: "linear-gradient(to bottom, black 20%, transparent 80%), radial-gradient(ellipse 35vw 45vh at 50% 35%, black 0%, transparent 70%), conic-gradient(from 140deg at 50% 32%, transparent 0deg, black 20deg, black 60deg, transparent 100deg)",
-
-                      maskImage: "linear-gradient(to bottom, black 20%, transparent 80%), radial-gradient(ellipse 35vw 45vh at 50% 35%, black 0%, transparent 70%), conic-gradient(from 140deg at 50% 32%, transparent 0deg, black 20deg, black 60deg, transparent 100deg)",
+                      WebkitMaskImage:
+                        "linear-gradient(to bottom, black 20%, transparent 80%), radial-gradient(ellipse 35vw 45vh at 50% 35%, black 0%, transparent 70%), conic-gradient(from 140deg at 50% 32%, transparent 0deg, black 20deg, black 60deg, transparent 100deg)",
+                      maskImage:
+                        "linear-gradient(to bottom, black 20%, transparent 80%), radial-gradient(ellipse 35vw 45vh at 50% 35%, black 0%, transparent 70%), conic-gradient(from 140deg at 50% 32%, transparent 0deg, black 20deg, black 60deg, transparent 100deg)",
                       WebkitMaskComposite: "source-in, source-over",
-
                       maskComposite: "intersect, add",
                     }}
                   />
 
-                  {/* FIX 2: THE INVISIBLE ANCHOR
-                    This stops the layout from collapsing to 0x0 pixels when the real card flies away.
-                    Because it's opacity-0, when the card leaves, it leaves a beautiful glowing empty spotlight! */}
-                  {/* The Invisible Anchor */}
                   <div className="relative z-0 opacity-0 pointer-events-none">
-                    <HackNiteCard title={title} hashtagLines={hashtags} />
+                    <HackNiteCard
+                      title={title}
+                      hashtagLines={hashtags}
+                    />
                   </div>
 
-                  {/* 3. THE FLYING CARD
-                    Now positioned absolute so it perfectly overlaps the invisible anchor */}
                   <motion.div
                     layoutId={`card-${index}`}
                     className="absolute inset-0 z-10 transition-transform duration-300 group-hover:scale-105"
                     transition={linearTransition}
                   >
-                    <HackNiteCard title={title} hashtagLines={hashtags} />
+                    <HackNiteCard
+                      title={title}
+                      hashtagLines={hashtags}
+                    />
                   </motion.div>
 
-                  {/* 4. The Shadow Overlay */}
                   <div
-                    // Removed the border/clip-padding classes, added rounded-[inherit]
-                    className={`absolute inset-0 z-20 pointer-events-none transition-all duration-300 group-hover:scale-105 rounded-[inherit] ${selectedItem?.uniqueIndex === index ? "opacity-0" : "opacity-100"
-                      }`}
-                    // Added a custom radial shadow that naturally hugs the bottom corners
+                    className={`absolute inset-0 z-20 pointer-events-none transition-all duration-300 group-hover:scale-105 rounded-[inherit] ${
+                      selectedItem?.uniqueIndex === index
+                        ? "opacity-0"
+                        : "opacity-100"
+                    }`}
                     style={{
-                      background: "radial-gradient(120% 120% at 50% -10%, transparent 30%, rgba(0,0,0,0.5) 75%, rgba(0,0,0,0.95) 100%)"
+                      background:
+                        "radial-gradient(120% 120% at 50% -10%, transparent 30%, rgba(0,0,0,0.5) 75%, rgba(0,0,0,0.95) 100%)",
                     }}
                   />
                 </div>
@@ -174,8 +187,7 @@ const HorizontalGallery = () => {
                     hashtagLines={selectedItem._hashtags}
                   />
                 </motion.div>
-                
-                {/* Independent Unscaled Interactive Button outside the card */}
+
                 <motion.button
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -185,11 +197,17 @@ const HorizontalGallery = () => {
                     e.stopPropagation();
                     const hid = selectedItem?.id;
                     if (hid != null) {
-                      navigate(`/heist_description/${hid}`, { state: { heist: selectedItem } });
+                      navigate(`/heist_description/${hid}`, {
+                        state: { heist: selectedItem },
+                      });
                     }
                   }}
                   className="absolute left-1/2 -translate-x-1/2 -bottom-[9rem] bg-[#2c1303] text-[#f0e8d0] font-['Bungee'] py-[0.75rem] px-[2.5rem] shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:scale-105 active:scale-95 transition-transform"
-                  style={{ fontSize: 20, border: "2px solid black", letterSpacing: "1px" }}
+                  style={{
+                    fontSize: 20,
+                    border: "2px solid black",
+                    letterSpacing: "1px",
+                  }}
                 >
                   {role === "fixer" ? "SEE APPLICANTS" : "APPLY"}
                 </motion.button>
