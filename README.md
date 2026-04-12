@@ -1,4 +1,4 @@
-# Sicari.works — The Syndicate
+# Sicari.works
 
 > **Sicari.works is a full-stack, role-based matching platform disguised as an underground Las Vegas job board.**
 > Beneath the thematic UI lies a robust Node.js and Express backend engineered for secure data isolation and complex state management. It connects Fixers (job posters) with Sicarios (applicants) using a custom server-side matching engine. By computing the array intersection between a candidate's defined skills and a job's strict requirements, the system generates a weighted fit_score and dynamically sorts the payload before the API responds.
