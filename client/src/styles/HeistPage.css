@@ -1,0 +1,789 @@
+/* ========================================
+   HEIST PAGE — Scrollytelling Styles
+   ======================================== */
+
+/* ---------- Google Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* ---------- CSS Variables ---------- */
+:root {
+  --heist-bg: #0a0a0c;
+  --heist-surface: #111114;
+  --heist-text: #e8e4df;
+  --heist-text-dim: #8a8680;
+  --heist-accent-red: #c0392b;
+  --heist-accent-amber: #d4a017;
+  --heist-accent-gold: #c9a84c;
+  --heist-accent-green: #1abc6c;
+  --heist-accent-cyan: #17a8a2;
+  --heist-redact: #1a1a1e;
+  --heist-border: #2a2a2f;
+  --font-display: 'Playfair Display', 'Lora', Georgia, serif;
+  --font-mono: 'JetBrains Mono', 'Source Code Pro', 'Courier New', monospace;
+  --font-body: 'Lora', Georgia, serif;
+}
+
+/* ---------- Base Container ---------- */
+.heist-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--heist-bg);
+  color: var(--heist-text);
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-family: var(--font-body);
+}
+
+/* ---------- Noise & Scanline Overlays ---------- */
+.heist-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.035;
+  /* background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); */
+  background-size: 256px 256px;
+}
+
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+}
+
+/* ---------- Fixed Background System ---------- */
+.heist-bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  will-change: opacity, filter;
+  transition: opacity 0.8s ease, filter 0.8s ease;
+}
+
+.heist-bg-layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.heist-bg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 12, 0.7) 0%,
+    rgba(10, 10, 12, 0.4) 30%,
+    rgba(10, 10, 12, 0.5) 60%,
+    rgba(10, 10, 12, 0.9) 100%
+  );
+  pointer-events: none;
+}
+
+/* ---------- Scroll Content Layer ---------- */
+.heist-scroll-content {
+  position: relative;
+  z-index: 10;
+}
+
+/* ---------- Hero / Cover ---------- */
+.heist-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 2rem 6rem;
+}
+
+.heist-hero-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.heist-classification {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--heist-accent-red);
+  border: 1px solid var(--heist-accent-red);
+  padding: 0.35rem 1rem;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  animation: pulse-border 3s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: var(--heist-accent-red); box-shadow: 0 0 0px rgba(192, 57, 43, 0); }
+  50% { border-color: rgba(192, 57, 43, 0.6); box-shadow: 0 0 15px rgba(192, 57, 43, 0.15); }
+}
+
+.heist-hero-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2.8rem, 8vw, 6.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: var(--heist-text);
+  margin: 0 0 1.5rem;
+  text-shadow: 0 2px 40px rgba(0,0,0,0.5);
+}
+
+.heist-hero-title span {
+  display: block;
+}
+
+.heist-hero-title .accent-gold {
+  color: var(--heist-accent-gold);
+  font-style: italic;
+}
+
+.heist-hero-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--heist-text-dim);
+  letter-spacing: 0.08em;
+  line-height: 1.7;
+  max-width: 560px;
+  margin-bottom: 2rem;
+}
+
+.heist-hero-meta {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--heist-text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-top: 1px solid var(--heist-border);
+  padding-top: 1.5rem;
+}
+
+.heist-hero-meta .dot {
+  width: 4px;
+  height: 4px;
+  background: var(--heist-accent-red);
+  border-radius: 50%;
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--heist-text-dim);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+.scroll-indicator .scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--heist-text-dim), transparent);
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+  50% { transform: translateX(-50%) translateY(8px); opacity: 0.5; }
+}
+
+/* ---------- Scroll Sections ---------- */
+.heist-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  position: relative;
+}
+
+.heist-section-content {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ---------- Phase Headers ---------- */
+.phase-header {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--heist-border);
+}
+
+.phase-number {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--heist-accent-amber);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.phase-number::before {
+  content: '';
+  width: 30px;
+  height: 1px;
+  background: var(--heist-accent-amber);
+}
+
+.phase-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--heist-text);
+  margin: 0;
+}
+
+.phase-title.red { color: var(--heist-accent-red); }
+.phase-title.amber { color: var(--heist-accent-amber); }
+.phase-title.green { color: var(--heist-accent-green); }
+
+/* ---------- Redacted Document Block ---------- */
+.redacted-doc {
+  background: rgba(17, 17, 20, 0.85);
+  border: 1px solid var(--heist-border);
+  padding: 2.5rem;
+  margin: 2rem 0;
+  position: relative;
+  backdrop-filter: blur(20px);
+}
+
+.redacted-doc::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--heist-accent-red);
+}
+
+.redacted-doc .doc-header {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--heist-accent-red);
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.redacted-doc .doc-header .stamp {
+  border: 1px solid var(--heist-accent-red);
+  padding: 0.15rem 0.5rem;
+  transform: rotate(-3deg);
+  font-weight: 700;
+}
+
+.redacted-text {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 2;
+  color: var(--heist-text);
+}
+
+.redacted-text .redact {
+  background: var(--heist-redact);
+  color: var(--heist-redact);
+  padding: 0.1em 0.5em;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.redacted-text .redact:hover {
+  background: var(--heist-accent-red);
+  color: white;
+}
+
+/* ---------- Intel Grid ---------- */
+.intel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--heist-border);
+  margin: 2.5rem 0;
+}
+
+.intel-card {
+  background: var(--heist-surface);
+  padding: 1.5rem;
+}
+
+.intel-card .label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--heist-text-dim);
+  margin-bottom: 0.75rem;
+}
+
+.intel-card .value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--heist-accent-gold);
+}
+
+.intel-card .detail {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--heist-text-dim);
+  margin-top: 0.5rem;
+}
+
+/* ---------- Timeline ---------- */
+.heist-timeline {
+  position: relative;
+  padding-left: 3rem;
+  margin: 2.5rem 0;
+}
+
+.heist-timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 12px;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--heist-accent-red), var(--heist-accent-amber), transparent);
+}
+
+.timeline-entry {
+  position: relative;
+  margin-bottom: 2.5rem;
+  padding-left: 1rem;
+}
+
+.timeline-entry::before {
+  content: '';
+  position: absolute;
+  left: -2.45rem;
+  top: 0.5rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--heist-accent-red);
+  box-shadow: 0 0 12px rgba(192, 57, 43, 0.4);
+}
+
+.timeline-entry.active::before {
+  background: var(--heist-accent-amber);
+  box-shadow: 0 0 15px rgba(212, 160, 23, 0.5);
+}
+
+.timeline-time {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--heist-accent-amber);
+  margin-bottom: 0.5rem;
+}
+
+.timeline-event {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--heist-text);
+  margin-bottom: 0.5rem;
+}
+
+.timeline-desc {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.7;
+  color: var(--heist-text-dim);
+}
+
+/* ---------- Heat Level Bar ---------- */
+.heat-level {
+  margin: 2rem 0;
+  padding: 1.5rem 2rem;
+  background: rgba(17, 17, 20, 0.8);
+  border: 1px solid var(--heist-border);
+  backdrop-filter: blur(10px);
+}
+
+.heat-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--heist-text-dim);
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.heat-label .heat-value {
+  color: var(--heist-accent-red);
+  font-weight: 700;
+}
+
+.heat-bar-track {
+  width: 100%;
+  height: 4px;
+  background: var(--heist-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.heat-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--heist-accent-amber), var(--heist-accent-red));
+  box-shadow: 0 0 15px rgba(192, 57, 43, 0.4);
+  transition: width 1.5s ease;
+}
+
+/* ---------- Personnel Cards ---------- */
+.personnel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.personnel-card {
+  background: var(--heist-surface);
+  border: 1px solid var(--heist-border);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.personnel-card:hover {
+  border-color: var(--heist-accent-gold);
+}
+
+.personnel-card .role-tag {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--heist-accent-amber);
+  margin-bottom: 0.75rem;
+}
+
+.personnel-card .codename {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--heist-text);
+  margin-bottom: 0.5rem;
+}
+
+.personnel-card .specialty {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--heist-text-dim);
+  line-height: 1.6;
+}
+
+.personnel-card .status-dot {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--heist-accent-green);
+  box-shadow: 0 0 8px rgba(26, 188, 108, 0.5);
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ---------- Money Flow / Extraction ---------- */
+.money-flow {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: rgba(17, 17, 20, 0.85);
+  border: 1px solid var(--heist-border);
+  position: relative;
+}
+
+.money-flow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--heist-accent-cyan), transparent);
+}
+
+.flow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(42, 42, 47, 0.5);
+}
+
+.flow-step:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.flow-step-number {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.8rem;
+  color: rgba(23, 168, 162, 0.3);
+  min-width: 40px;
+}
+
+.flow-step-content .flow-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--heist-text);
+  margin-bottom: 0.35rem;
+}
+
+.flow-step-content .flow-desc {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--heist-text-dim);
+  line-height: 1.6;
+}
+
+/* ---------- Typewriter Cursor ---------- */
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--heist-accent-amber);
+  margin-left: 2px;
+  animation: cursor-blink 1s steps(1) infinite;
+  vertical-align: text-bottom;
+}
+
+@keyframes cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* ---------- Section Divider ---------- */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 1rem 0;
+  padding: 3rem 2rem;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section-divider .divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--heist-border);
+}
+
+.section-divider .divider-icon {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--heist-text-dim);
+  text-transform: uppercase;
+}
+
+/* ---------- Narrative Text ---------- */
+.narrative-text {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  line-height: 1.85;
+  color: var(--heist-text);
+  margin-bottom: 1.5rem;
+}
+
+.narrative-text em {
+  color: var(--heist-accent-gold);
+  font-style: italic;
+}
+
+.narrative-text strong {
+  color: var(--heist-accent-red);
+  font-weight: 700;
+}
+
+/* ---------- Pull Quote ---------- */
+.pull-quote {
+  border-left: 3px solid var(--heist-accent-gold);
+  padding: 1.5rem 2rem;
+  margin: 3rem 0;
+  background: rgba(201, 168, 76, 0.03);
+}
+
+.pull-quote p {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--heist-text);
+  margin: 0 0 1rem;
+}
+
+.pull-quote cite {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--heist-text-dim);
+  font-style: normal;
+}
+
+/* ---------- Mission Objective Box ---------- */
+.mission-objective {
+  background: rgba(17, 17, 20, 0.9);
+  border: 1px solid var(--heist-accent-amber);
+  padding: 2rem;
+  margin: 2rem 0;
+  position: relative;
+}
+
+.mission-objective::before {
+  content: '⬡';
+  position: absolute;
+  top: -12px;
+  left: 20px;
+  background: var(--heist-bg);
+  padding: 0 0.5rem;
+  color: var(--heist-accent-amber);
+  font-size: 1.2rem;
+}
+
+.mission-objective .obj-label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--heist-accent-amber);
+  margin-bottom: 1rem;
+}
+
+.mission-objective .obj-text {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--heist-text);
+}
+
+/* ---------- Bottom Dossier ---------- */
+.dossier-footer {
+  padding: 6rem 2rem;
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  border-top: 1px solid var(--heist-border);
+}
+
+.dossier-footer .end-stamp {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: var(--heist-accent-red);
+  opacity: 0.6;
+}
+
+/* ---------- Progress Bar ---------- */
+.heist-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  z-index: 200;
+  background: transparent;
+}
+
+.heist-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--heist-accent-red), var(--heist-accent-amber), var(--heist-accent-gold));
+  transform-origin: left;
+  will-change: transform;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .heist-hero {
+    padding: 0 1.25rem 4rem;
+  }
+
+  .heist-section {
+    padding: 3rem 1.25rem;
+  }
+
+  .redacted-doc {
+    padding: 1.5rem;
+  }
+
+  .intel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .personnel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .heist-hero-meta {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .heist-timeline {
+    padding-left: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .heist-hero-title {
+    font-size: 2.2rem;
+  }
+
+  .phase-title {
+    font-size: 1.8rem;
+  }
+}
