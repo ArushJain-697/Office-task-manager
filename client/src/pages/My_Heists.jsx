@@ -3,21 +3,25 @@ import HackNiteCard from "../components/HackNiteCard";
 
 const APPLICATIONS_URL = "https://api.sicari.works/api/sicario/applications";
 
-function applicationToCardProps(app) {
-  const subheading = app.subheading ?? "";
-  const payout = app.payout;
-  const payoutLine =
-    payout != null && payout !== ""
-      ? `# ${typeof payout === "number" ? payout.toLocaleString() : String(payout)}`
-      : "# —";
-  const status = app.status ?? "";
-
+function applicationToCardProps(application) {
   return {
-    title: app.heading ?? "Untitled",
+    title: application.operation_name ?? "Untitled",
     hashtagLines: [
-      subheading ? `# ${subheading}` : "# —",
-      payoutLine,
-      status ? `# ${status}` : "# —",
+      application.target
+        ? `# ${application.target}`
+        : "# —",
+
+      application.heist_status
+        ? `# ${
+            typeof application.heist_status === "number"
+              ? application.heist_status.toLocaleString()
+              : String(application.heist_status)
+          }`
+        : "# —",
+
+      application.status
+        ? `# ${application.status}`
+        : "# —",
     ],
   };
 }
@@ -30,13 +34,17 @@ const MyHeists = () => {
     let cancelled = false;
 
     fetch(APPLICATIONS_URL, { credentials: "include" })
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
-      .then((data) => {
+      .then((res) =>
+        res.ok ? res.json() : Promise.reject(new Error(String(res.status)))
+      )
+      .then((response) => {
         if (cancelled) return;
-        const list = Array.isArray(data)
-          ? data
-          : data.applications ?? data.data ?? [];
-        setApplications(Array.isArray(list) ? list : []);
+
+        const applicationsList = Array.isArray(response)
+          ? response
+          : response.applications ?? response.data ?? [];
+
+        setApplications(Array.isArray(applicationsList) ? applicationsList : []);
       })
       .catch(() => {
         if (!cancelled) setApplications([]);
@@ -66,23 +74,30 @@ const MyHeists = () => {
       {loading ? (
         <p className="text-center text-neutral-400">Loading…</p>
       ) : applications.length === 0 ? (
-        <p className="text-center text-neutral-400">No applications yet.</p>
+        <p className="text-center text-neutral-400">
+          No applications yet.
+        </p>
       ) : (
         <div className="flex flex-wrap justify-center gap-x-12 gap-y-16">
-          {applications.map((app) => {
+          {applications.map((application) => {
             const id =
-              app.application_id ??
-              app["heist id"] ??
-              app.heist_id ??
-              `${app.heading}-${app.created_at}`;
-            const { title, hashtagLines } = applicationToCardProps(app);
+              application.application_id ??
+              application.heist_id ??
+              `${application.operation_name}-${application.created_at}`;
+
+            const { title, hashtagLines } =
+              applicationToCardProps(application);
+
             return (
               <div
                 key={id}
                 className="flex justify-center"
                 style={{ width: 381 }}
               >
-                <HackNiteCard title={title} hashtagLines={hashtagLines} />
+                <HackNiteCard
+                  title={title}
+                  hashtagLines={hashtagLines}
+                />
               </div>
             );
           })}

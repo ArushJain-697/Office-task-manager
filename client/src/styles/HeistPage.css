@@ -4,7 +4,7 @@
 
 /* ---------- Google Fonts ---------- */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
-
+@import "tailwindcss";
 /* ---------- CSS Variables ---------- */
 :root {
   --heist-bg: #0a0a0c;
@@ -24,15 +24,21 @@
 }
 
 /* ---------- Base Container ---------- */
+/* #root uses overflow:hidden globally; this page is its own scrollport */
 .heist-page {
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  background: var(--heist-bg);
-  color: var(--heist-text);
+  position: fixed;
+  inset: 0;
+  z-index: 50;
   overflow-x: hidden;
   overflow-y: auto;
-  font-family: var(--font-body);
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+  background: var(--heist-bg);
+}
+
+.heist-scroll-content {
+  position: relative;
+  z-index: 2;
 }
 
 /* ---------- Noise & Scanline Overlays ---------- */
@@ -70,11 +76,21 @@
   transition: opacity 0.8s ease, filter 0.8s ease;
 }
 
-.heist-bg-layer img {
+.heist-bg-layer .heist-bg-fill {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
+}
+
+.heist-bg-layer img.heist-bg-fill {
   object-fit: cover;
   object-position: center;
+}
+
+.heist-bg-layer .heist-bg-gradient {
+  background-size: cover;
+  background-position: center;
 }
 
 .heist-bg-overlay {
@@ -92,10 +108,6 @@
 }
 
 /* ---------- Scroll Content Layer ---------- */
-.heist-scroll-content {
-  position: relative;
-  z-index: 10;
-}
 
 /* ---------- Hero / Cover ---------- */
 .heist-hero {

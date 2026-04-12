@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import "../styles/HeistPage.css";
@@ -10,7 +10,7 @@ function ScrollSection({ children, className = "", id }) {
   return (
     <motion.section
       id={id}
-      className={`heist-section ${className}`}
+      className={`heist-section py-12 md:py-16 ${className}`}
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: false, amount: 0.3 }}
@@ -48,7 +48,14 @@ function RedactedSpan({ children }) {
   return (
     <span
       className="redact"
-      style={revealed ? { background: "rgba(192,57,43,0.15)", color: "var(--heist-accent-red)" } : {}}
+      style={
+        revealed
+          ? {
+              background: "rgba(192,57,43,0.15)",
+              color: "var(--heist-accent-red)",
+            }
+          : {}
+      }
       onClick={() => setRevealed(!revealed)}
       title="Click to reveal"
     >
@@ -66,8 +73,10 @@ function HeatBar({ level, label }) {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setInView(true); },
-      { threshold: 0.5 }
+      ([entry]) => {
+        if (entry.isIntersecting) setInView(true);
+      },
+      { threshold: 0.5 },
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
@@ -84,7 +93,11 @@ function HeatBar({ level, label }) {
           className="heat-bar-fill"
           initial={{ width: 0 }}
           animate={inView ? { width: `${level}%` } : { width: 0 }}
-          transition={{ duration: 1.8, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.3 }}
+          transition={{
+            duration: 1.8,
+            ease: [0.25, 0.46, 0.45, 0.94],
+            delay: 0.3,
+          }}
         />
       </div>
     </div>
@@ -99,15 +112,109 @@ function idsMatch(a, b) {
   );
 }
 
+function heistRecordId(h) {
+  if (h == null) return null;
+  return h.id ?? h.heist_id ?? h["heist id"];
+}
+
+const PHASE_BG_GRADIENTS = [
+  "linear-gradient(165deg, #120505 0%, #2d1218 45%, #0a0a0c 100%)",
+  "linear-gradient(165deg, #0a1210 0%, #152a22 50%, #0a0a0c 100%)",
+  "linear-gradient(165deg, #0a0c12 0%, #151a2d 50%, #050508 100%)",
+];
+
 export default function HeistDescription() {
+  const [applying, setApplying] = useState(false);
   const navigate = useNavigate();
-  const { id } = useParams();  
+  const { id } = useParams();
   const location = useLocation();
   const stateHeist = location.state?.heist;
+  const scrollRef = useRef(null);
 
-  const heistId = id != null ? Number(id) : stateHeist?.id != null ? Number(stateHeist.id) : null;
+  const heistId =
+    id != null
+      ? Number(id)
+      : heistRecordId(stateHeist) != null
+        ? Number(heistRecordId(stateHeist))
+        : null;
 
-  const [heist, setHeist] = useState(() => (stateHeist && idsMatch(stateHeist.id, heistId) ? stateHeist : null));
+  const transformHeist = useCallback((apiHeist) => {
+    if (!apiHeist) return null;
+    const existingA = apiHeist.section_a;
+    const heading =
+      apiHeist.heading ??
+      apiHeist.title ??
+      apiHeist.name ??
+      existingA?.operation_name;
+    const sub = apiHeist.subheading ?? apiHeist.target ?? existingA?.target;
+
+    return {
+      id: heistRecordId(apiHeist),
+      status: apiHeist.status ?? apiHeist.heist_status,
+      created_at: apiHeist.created_at,
+
+      section_a: {
+        operation_name: heading,
+        target: sub,
+        introduction: apiHeist.short_description ?? existingA?.introduction,
+        quote: apiHeist.quote ?? existingA?.quote,
+        place: apiHeist.place ?? existingA?.place,
+      },
+
+      section_b: {
+        ...apiHeist.section_b,
+        phase1_description:
+          apiHeist.section_b?.phase1_description ?? apiHeist.short_description,
+        phase1_photo_url:
+          apiHeist.section_b?.phase1_photo_url ?? apiHeist.photos?.[0]?.url,
+      },
+
+      section_c: {
+        ...apiHeist.section_c,
+        execution_description:
+          apiHeist.section_c?.execution_description ??
+          apiHeist.short_description,
+        execution_photo_url:
+          apiHeist.section_c?.execution_photo_url ?? apiHeist.photos?.[1]?.url,
+        timeline: Array.isArray(apiHeist.section_c?.timeline)
+          ? apiHeist.section_c.timeline
+          : [
+              {
+                time: apiHeist.timeline,
+                step: 1,
+                desc: "Execution window",
+              },
+            ],
+      },
+
+      section_d: {
+        ...apiHeist.section_d,
+        extraction_plan: apiHeist.section_d?.extraction_plan ?? "Planned",
+        extraction_photo_url:
+          apiHeist.section_d?.extraction_photo_url ?? apiHeist.photos?.[2]?.url,
+      },
+
+      section_e: {
+        ...apiHeist.section_e,
+        crew_members:
+          apiHeist.section_e?.crew_members ??
+          apiHeist.required_skills?.map((s) => ({
+            job: s.role,
+            title: s.role,
+            money_share: s.moneyshare,
+            requirements: "Skill based",
+            threat_level: apiHeist.crew_details?.threat_level,
+          })),
+      },
+    };
+  }, []);
+  const [heist, setHeist] = useState(() => {
+    const sid = heistRecordId(stateHeist);
+    if (stateHeist && idsMatch(sid, heistId)) {
+      return transformHeist(stateHeist);
+    }
+    return null;
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -124,7 +231,8 @@ export default function HeistDescription() {
       .then((res) => res.json())
       .then((authData) => {
         const userRole = authData?.user?.role || "sicario";
-        const url = userRole === "fixer"
+        const url =
+          userRole === "fixer"
             ? "https://api.sicari.works/api/fixer/heists"
             : "https://api.sicari.works/api/sicario/heists";
         return fetch(url, { credentials: "include" });
@@ -133,12 +241,13 @@ export default function HeistDescription() {
       .then((data) => {
         if (cancelled) return;
         const arr = Array.isArray(data) ? data : data.heists || data.data || [];
-        const found = arr.find((h) => idsMatch(h.id, heistId));
+        const found = arr.find((h) => Number(heistRecordId(h)) === heistId);
+
         if (found) {
-          setHeist(found);
-          setError(null);
-        } else if (stateHeist && idsMatch(stateHeist.id, heistId)) {
-          setHeist(stateHeist);
+          const transformed = transformHeist(found);
+          setHeist(transformed);
+        } else if (stateHeist && idsMatch(heistRecordId(stateHeist), heistId)) {
+          setHeist(transformHeist(stateHeist));
           setError(null);
         } else {
           setHeist(null);
@@ -147,8 +256,8 @@ export default function HeistDescription() {
       })
       .catch(() => {
         if (cancelled) return;
-        if (stateHeist && idsMatch(stateHeist.id, heistId)) {
-          setHeist(stateHeist);
+        if (stateHeist && idsMatch(heistRecordId(stateHeist), heistId)) {
+          setHeist(transformHeist(stateHeist));
           setError(null);
         } else {
           setError("fetch-failed");
@@ -161,29 +270,41 @@ export default function HeistDescription() {
     return () => {
       cancelled = true;
     };
-  }, [heistId, stateHeist?.id]);
+  }, [heistId, stateHeist, transformHeist]);
 
-  // Framer motion scroll setup
-  const containerRef = useRef(null);
+  // Framer motion scroll setup (page scrolls inside .heist-page, not the document)
+  const { scrollYProgress } = useScroll({ container: scrollRef });
 
-  const { scrollYProgress } = useScroll({ container: containerRef });
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
 
   const bgY1 = useTransform(scrollYProgress, [0, 0.33], ["0%", "-8%"]);
   const bgY2 = useTransform(scrollYProgress, [0.33, 0.66], ["0%", "-8%"]);
   const bgY3 = useTransform(scrollYProgress, [0.66, 1], ["0%", "-8%"]);
 
   const bg1Opacity = useTransform(scrollYProgress, [0, 0.28, 0.35], [1, 1, 0]);
-  const bg2Opacity = useTransform(scrollYProgress, [0.28, 0.35, 0.62, 0.68], [0, 1, 1, 0]);
+  const bg2Opacity = useTransform(
+    scrollYProgress,
+    [0.28, 0.35, 0.62, 0.68],
+    [0, 1, 1, 0],
+  );
   const bg3Opacity = useTransform(scrollYProgress, [0.62, 0.68, 1], [0, 1, 1]);
 
   const bg1Blur = useTransform(scrollYProgress, [0, 0.15, 0.3], [0, 2, 6]);
   const bg2Blur = useTransform(scrollYProgress, [0.35, 0.5, 0.65], [0, 2, 5]);
   const bg3Blur = useTransform(scrollYProgress, [0.68, 0.85, 1], [0, 1, 3]);
-
+  const bg1Filter = useTransform(bg1Blur, (v) => `blur(${v}px) grayscale(0.2)`);
+  const bg2Filter = useTransform(bg2Blur, (v) => `blur(${v}px) saturate(1.3)`);
+  const bg3Filter = useTransform(bg3Blur, (v) => `blur(${v}px) grayscale(0.4)`);
   if (loading) {
     return (
-      <div className="fixed inset-0 z-[1000] flex items-center justify-center text-[#e8dcc8]" style={{ background: "#0a0a0c", fontFamily: "var(--font-mono)" }}>
+      <div
+        className="fixed inset-0 z-[1000] flex items-center justify-center text-[#e8dcc8]"
+        style={{ background: "#0a0a0c", fontFamily: "var(--font-mono)" }}
+      >
         Loading operation data...
       </div>
     );
@@ -191,9 +312,20 @@ export default function HeistDescription() {
 
   if (error === "missing-id" || !heist) {
     return (
-      <div className="fixed inset-0 z-[1000] flex flex-col items-center justify-center gap-6 text-[#e8dcc8]" style={{ background: "#0a0a0c", fontFamily: "var(--font-mono)" }}>
-        <p>{error === "missing-id" ? "No case file selected." : "File not found or restricted."}</p>
-        <button type="button" className="border-2 border-[#c9a84c] px-6 py-2 uppercase tracking-widest text-[#c9a84c]" onClick={() => navigate("/Heists")}>
+      <div
+        className="fixed inset-0 z-[1000] flex flex-col items-center justify-center gap-6 text-[#e8dcc8]"
+        style={{ background: "#0a0a0c", fontFamily: "var(--font-mono)" }}
+      >
+        <p>
+          {error === "missing-id"
+            ? "No case file selected."
+            : "File not found or restricted."}
+        </p>
+        <button
+          type="button"
+          className="border-2 border-[#c9a84c] px-6 py-2 uppercase tracking-widest text-[#c9a84c]"
+          onClick={() => navigate("/Heists")}
+        >
           Return to wall
         </button>
       </div>
@@ -202,73 +334,204 @@ export default function HeistDescription() {
 
   const { section_a, section_b, section_c, section_d, section_e } = heist;
 
-  // Fallbacks for URLs
-  const defaultBg1 = "/assets/heist/phase1_recon.png";
-  const defaultBg2 = "/assets/heist/phase2_execution.png";
-  const defaultBg3 = "/assets/heist/phase3_extraction.png";
-
-  const backgrounds = [
-    section_b?.phase1_photo_url || defaultBg1,
-    section_c?.execution_photo_url || defaultBg2,
-    section_d?.extraction_photo_url || defaultBg3,
+  const photoUrls = [
+    section_b?.phase1_photo_url,
+    section_c?.execution_photo_url,
+    section_d?.extraction_photo_url,
   ];
 
   // Helper variables
-  const operationName = section_a?.operation_name || "Unknown Operation";
+  const operationName =
+    section_a?.operation_name?.trim() ||
+    section_a?.target?.trim() ||
+    "Unknown Operation";
   const target = section_a?.target || "Unknown Target";
-  const creationDate = heist.created_at ? new Date(heist.created_at).toISOString().split('T')[0] : "classified";
-  const timelineEvents = Array.isArray(section_c?.timeline) ? section_c.timeline : [];
-  const teamArray = Array.isArray(section_e?.crew_members) ? section_e.crew_members : [];
+  const creationDate = heist.created_at
+    ? new Date(heist.created_at).toISOString().split("T")[0]
+    : "classified";
+  const timelineEvents = Array.isArray(section_c?.timeline)
+    ? section_c.timeline
+    : [];
+  const teamArray = Array.isArray(section_e?.crew_members)
+    ? section_e.crew_members
+    : [];
+  const handleApply = async () => {
+    if (applying) return;
+    setApplying(true);
 
+    try {
+      const res = await fetch(
+        `https://api.sicari.works/api/sicario/apply/${heist.id}`,
+        {
+          method: "POST",
+          credentials: "include",
+        },
+      );
+
+      if (res.ok) {
+        navigate("/my_heists");
+      } else {
+        const data = await res.json();
+        alert(data.message || "Failed to apply");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    } finally {
+      setApplying(false);
+    }
+  };
   return (
-    <div className="heist-page" ref={containerRef}>
+    <div className="heist-page" ref={scrollRef}>
       <div className="heist-progress">
         <motion.div className="heist-progress-bar" style={{ scaleX }} />
       </div>
 
       <div className="scanlines" />
 
-      <motion.div className="heist-bg-layer" style={{ opacity: bg1Opacity, filter: useTransform(bg1Blur, (v) => `blur(${v}px) grayscale(0.2)`), y: bgY1 }}>
-        <img src={backgrounds[0]} alt="Phase 1" loading="eager" />
+      <motion.div
+        className="heist-bg-layer"
+        style={{
+          opacity: bg1Opacity,
+          filter: bg1Filter,
+          y: bgY1,
+        }}
+      >
+        {photoUrls[0] ? (
+          <img
+            className="heist-bg-fill"
+            src={photoUrls[0]}
+            alt=""
+            loading="eager"
+          />
+        ) : (
+          <div
+            className="heist-bg-fill heist-bg-gradient"
+            style={{ background: PHASE_BG_GRADIENTS[0] }}
+            aria-hidden
+          />
+        )}
       </motion.div>
 
-      <motion.div className="heist-bg-layer" style={{ opacity: bg2Opacity, filter: useTransform(bg2Blur, (v) => `blur(${v}px) saturate(1.3)`), y: bgY2 }}>
-        <img src={backgrounds[1]} alt="Phase 2" loading="eager" />
+      <motion.div
+        className="heist-bg-layer"
+        style={{
+          opacity: bg2Opacity,
+          filter: bg2Filter,
+          y: bgY2,
+        }}
+      >
+        {photoUrls[1] ? (
+          <img
+            className="heist-bg-fill"
+            src={photoUrls[1]}
+            alt=""
+            loading="eager"
+          />
+        ) : (
+          <div
+            className="heist-bg-fill heist-bg-gradient"
+            style={{ background: PHASE_BG_GRADIENTS[1] }}
+            aria-hidden
+          />
+        )}
       </motion.div>
 
-      <motion.div className="heist-bg-layer" style={{ opacity: bg3Opacity, filter: useTransform(bg3Blur, (v) => `blur(${v}px) grayscale(0.4)`), y: bgY3 }}>
-        <img src={backgrounds[2]} alt="Phase 3" loading="eager" />
+      <motion.div
+        className="heist-bg-layer"
+        style={{
+          opacity: bg3Opacity,
+          filter: bg3Filter,
+          y: bgY3,
+        }}
+      >
+        {photoUrls[2] ? (
+          <img
+            className="heist-bg-fill"
+            src={photoUrls[2]}
+            alt=""
+            loading="eager"
+          />
+        ) : (
+          <div
+            className="heist-bg-fill heist-bg-gradient"
+            style={{ background: PHASE_BG_GRADIENTS[2] }}
+            aria-hidden
+          />
+        )}
       </motion.div>
 
-      <div className="heist-bg-overlay" />
+      <div className="heist-bg-overlay fixed inset-0 z-[2] bg-black/80 backdrop-blur-sm" />
 
-      <div className="heist-scroll-content">
-        <div style={{ padding: '2rem' }}>
-          <button onClick={() => navigate(-1)} style={{ color: 'var(--heist-text)', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', background: 'transparent', border: '1px solid var(--heist-border)', padding: '0.5rem 1rem', cursor: 'pointer', opacity: 0.8 }}>
+      <div className="heist-scroll-content relative z-[5]">
+        <div className="px-6 py-4">
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              color: "var(--heist-text)",
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.8rem",
+              background: "transparent",
+              border: "1px solid var(--heist-border)",
+              padding: "0.5rem 1rem",
+              cursor: "pointer",
+              opacity: 0.8,
+            }}
+          >
             &larr; BACK
           </button>
         </div>
 
-        <section className="heist-hero" id="heist-hero">
-          <motion.div className="heist-hero-inner" initial={{ opacity: 0, y: 60 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}>
-            <motion.div className="heist-classification" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5, duration: 0.6 }}>
+        <section className="heist-hero pb-16 md:pb-20" id="heist-hero">
+          <motion.div
+            className="heist-hero-inner"
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+          >
+            <motion.div
+              className="heist-classification"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+            >
               TS//SCI — EYES ONLY
             </motion.div>
 
-            <h1 className="heist-hero-title">
-              <motion.span initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.8 }}>
+            <h1 className="heist-hero-title text-5xl md:text-7xl font-bold leading-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
+              <motion.span
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.8 }}
+              >
                 Operation
               </motion.span>
-              <motion.span className="accent-gold" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.8 }}>
+              <motion.span
+                className="accent-gold"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9, duration: 0.8 }}
+              >
                 {operationName}
               </motion.span>
             </h1>
 
-            <motion.p className="heist-hero-subtitle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5, duration: 1 }}>
-              {section_a?.introduction || "A high stakes extraction. Zero casualties. Zero traces. Complete deniability."}
+            <motion.p
+              className="heist-hero-subtitle text-lg md:text-xl text-gray-200 leading-relaxed max-w-3xl drop-shadow-md"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.5, duration: 1 }}
+            >
+              {section_a?.introduction ||
+                "A high stakes extraction. Zero casualties. Zero traces. Complete deniability."}
             </motion.p>
 
-            <motion.div className="heist-hero-meta" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8, duration: 0.8 }}>
+            <motion.div
+              className="heist-hero-meta"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.8, duration: 0.8 }}
+            >
               <span>Case File: {heist.id || "CLASSIFIED"}</span>
               <span className="dot" />
               <span>Status: {heist.status || "UNKNOWN"}</span>
@@ -279,7 +542,12 @@ export default function HeistDescription() {
             </motion.div>
           </motion.div>
 
-          <motion.div className="scroll-indicator" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5, duration: 0.8 }}>
+          <motion.div
+            className="scroll-indicator"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2.5, duration: 0.8 }}
+          >
             <span>Scroll to Declassify</span>
             <div className="scroll-line" />
           </motion.div>
@@ -287,11 +555,20 @@ export default function HeistDescription() {
 
         {section_a?.quote && (
           <ScrollSection id="mission-objective">
-            <div className="heist-section-content">
+            <div className="heist-section-content space-y-6">
               <RevealBlock>
                 <div className="mission-objective">
-                  <div className="obj-label">Priority Alpha — Mission Objective</div>
-                  <div className="obj-text" style={{ textTransform: 'uppercase', fontSize: '1.2rem', lineHeight: 1.6 }}>
+                  <div className="obj-label">
+                    Priority Alpha — Mission Objective
+                  </div>
+                  <div
+                    className="obj-text"
+                    style={{
+                      textTransform: "uppercase",
+                      fontSize: "1.2rem",
+                      lineHeight: 1.6,
+                    }}
+                  >
                     {section_a.quote}
                   </div>
                 </div>
@@ -300,31 +577,38 @@ export default function HeistDescription() {
           </ScrollSection>
         )}
 
-        <div className="section-divider">
+        <div className="section-divider scale-130">
           <div className="divider-line" />
-          <div className="divider-icon">Phase I</div>
+          <div className="divider-icon text-4xl">Phase I</div>
           <div className="divider-line" />
         </div>
 
         <ScrollSection id="phase-1-header">
-          <div className="heist-section-content">
+          <div className="heist-section-content space-y-6">
             <RevealBlock>
               <div className="phase-header">
-                <div className="phase-number">Phase 01 — {section_b?.phase1_name || "Intel & Reconnaissance"}</div>
+                <div className="phase-number">
+                  Phase 01 —{" "}
+                  {section_b?.phase1_name || "Intel & Reconnaissance"}
+                </div>
                 <h2 className="phase-title amber">
-                  Know Thy <br />Enemy
+                  Know Thy <br />
+                  Enemy
                 </h2>
               </div>
             </RevealBlock>
             <RevealBlock delay={0.15}>
-              <p className="narrative-text">
-                {section_b?.phase1_description || "Every security rotation, every camera angle, and every biometric handshake has been catalogued."}
+              <p className="narrative-text text-base md:text-lg text-gray-200 leading-8 drop-shadow-md">
+                {section_b?.phase1_description ||
+                  "Every security rotation, every camera angle, and every biometric handshake has been catalogued."}
               </p>
             </RevealBlock>
             {section_a?.place && (
               <RevealBlock delay={0.25}>
-                <p className="narrative-text">
-                  The target facility is situated in <RedactedSpan>{section_a.place}</RedactedSpan>. Its blueprints are classified under restricted national security framing.
+                <p className="narrative-text text-base md:text-lg text-gray-200 leading-8 drop-shadow-md">
+                  The target facility is situated in{" "}
+                  <RedactedSpan>{section_a.place}</RedactedSpan>. Its blueprints
+                  are classified under restricted national security framing.
                 </p>
               </RevealBlock>
             )}
@@ -333,27 +617,67 @@ export default function HeistDescription() {
 
         {section_b?.intel && (
           <ScrollSection id="phase-1-intel">
-            <div className="heist-section-content">
+            <div className="heist-section-content space-y-6">
               <RevealBlock>
                 <div className="intel-grid">
-                  <motion.div className="intel-card" whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300 }}>
+                  <motion.div
+                    className="intel-card"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
                     <div className="label">End Points</div>
-                    <div className="value" style={{ fontSize: '1.1rem', marginTop: '10px' }}>{section_b.intel.end_points_mapped || "N/A"}</div>
+                    <div
+                      className="value"
+                      style={{ fontSize: "1.1rem", marginTop: "10px" }}
+                    >
+                      {section_b.intel.end_points_mapped || "N/A"}
+                    </div>
                     <div className="detail">Access mapped</div>
                   </motion.div>
-                  <motion.div className="intel-card" whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300 }}>
+                  <motion.div
+                    className="intel-card"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
                     <div className="label">Guard Rotations</div>
-                    <div className="value" style={{ fontSize: '1.1rem', marginTop: '10px' }}>{section_b.intel.guard_rotations || "N/A"}</div>
+                    <div
+                      className="value"
+                      style={{ fontSize: "1.1rem", marginTop: "10px" }}
+                    >
+                      {section_b.intel.guard_rotations || "N/A"}
+                    </div>
                     <div className="detail">Personnel cycles</div>
                   </motion.div>
-                  <motion.div className="intel-card" whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300 }}>
+                  <motion.div
+                    className="intel-card"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
                     <div className="label">Surveillance</div>
-                    <div className="value" style={{ fontSize: '1.1rem', marginTop: '10px' }}>{section_b.intel.surveillance_hours || "N/A"}</div>
+                    <div
+                      className="value"
+                      style={{ fontSize: "1.1rem", marginTop: "10px" }}
+                    >
+                      {section_b.intel.surveillance_hours || "N/A"}
+                    </div>
                     <div className="detail">Downtime estimated</div>
                   </motion.div>
-                  <motion.div className="intel-card" whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300 }}>
+                  <motion.div
+                    className="intel-card"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
                     <div className="label">Vulnerabilities</div>
-                    <div className="value" style={{ fontSize: '1.1rem', marginTop: '10px', color: 'var(--heist-accent-red)' }}>{section_b.intel.vulnerabilities_found || "N/A"}</div>
+                    <div
+                      className="value"
+                      style={{
+                        fontSize: "1.1rem",
+                        marginTop: "10px",
+                        color: "var(--heist-accent-red)",
+                      }}
+                    >
+                      {section_b.intel.vulnerabilities_found || "N/A"}
+                    </div>
                     <div className="detail">Identified weak points</div>
                   </motion.div>
                 </div>
@@ -369,18 +693,20 @@ export default function HeistDescription() {
         </div>
 
         <ScrollSection id="phase-2-header">
-          <div className="heist-section-content">
+          <div className="heist-section-content space-y-6">
             <RevealBlock>
               <div className="phase-header">
                 <div className="phase-number">Phase 02 — The Execution</div>
                 <h2 className="phase-title red">
-                  The Clock <br />Starts Now
+                  The Clock <br />
+                  Starts Now
                 </h2>
               </div>
             </RevealBlock>
             <RevealBlock delay={0.15}>
-              <p className="narrative-text">
-                {section_c?.execution_description || "After the insertion window, every second is accounted for—every movement choreographed to the millisecond."}
+              <p className="narrative-text text-base md:text-lg text-gray-200 leading-8 drop-shadow-md">
+                {section_c?.execution_description ||
+                  "After the insertion window, every second is accounted for—every movement choreographed to the millisecond."}
               </p>
             </RevealBlock>
           </div>
@@ -388,7 +714,7 @@ export default function HeistDescription() {
 
         {timelineEvents.length > 0 && (
           <ScrollSection id="phase-2-timeline">
-            <div className="heist-section-content">
+            <div className="heist-section-content space-y-6">
               <RevealBlock>
                 <div className="heist-timeline">
                   {timelineEvents.map((t, index) => (
@@ -412,7 +738,7 @@ export default function HeistDescription() {
         )}
 
         <ScrollSection id="phase-2-heat">
-          <div className="heist-section-content">
+          <div className="heist-section-content space-y-6">
             <RevealBlock>
               <HeatBar level={85} label="Threat Level — Active" />
             </RevealBlock>
@@ -437,9 +763,14 @@ export default function HeistDescription() {
                       <div className="role-tag">{p.job}</div>
                       <div className="codename">{p.title}</div>
                       <div className="specialty">
-                        Share: {p.money_share}<br/>
-                        Req: {p.requirements}<br/>
-                        Threat: <span style={{color: 'var(--heist-accent-red)'}}>{String(p.threat_level).toUpperCase()}</span>
+                        Share: {p.money_share}
+                        <br />
+                        Req: {p.requirements}
+                        <br />
+                        Threat:{" "}
+                        <span style={{ color: "var(--heist-accent-red)" }}>
+                          {String(p.threat_level).toUpperCase()}
+                        </span>
                       </div>
                     </motion.div>
                   ))}
@@ -456,18 +787,22 @@ export default function HeistDescription() {
         </div>
 
         <ScrollSection id="phase-3-header">
-          <div className="heist-section-content">
+          <div className="heist-section-content space-y-6">
             <RevealBlock>
               <div className="phase-header">
-                <div className="phase-number">Phase 03 — Extraction &amp; Laundering</div>
+                <div className="phase-number">
+                  Phase 03 — Extraction &amp; Laundering
+                </div>
                 <h2 className="phase-title green">
-                  Vanishing <br />Act
+                  Vanishing <br />
+                  Act
                 </h2>
               </div>
             </RevealBlock>
             <RevealBlock delay={0.15}>
-              <p className="narrative-text">
-                {section_d?.extraction_plan || "The assets leave the jurisdiction in separate streams—none traceable to the same origin."}
+              <p className="narrative-text text-base md:text-lg text-gray-200 leading-8 drop-shadow-md">
+                {section_d?.extraction_plan ||
+                  "The assets leave the jurisdiction in separate streams—none traceable to the same origin."}
               </p>
             </RevealBlock>
           </div>
@@ -505,8 +840,10 @@ export default function HeistDescription() {
                   className="heist-apply-btn"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={handleApply}
+                  disabled={applying}
                 >
-                  APPLY FOR CREW
+                  {applying ? "APPLYING..." : "APPLY FOR CREW"}
                 </motion.button>
               </div>
             </RevealBlock>

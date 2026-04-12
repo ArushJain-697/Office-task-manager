@@ -38,9 +38,7 @@ const HorizontalGallery = () => {
       })
       .then((res) => res.json())
       .then((data) => {
-        const arr = Array.isArray(data)
-          ? data
-          : data.heists || data.data || [];
+        const arr = Array.isArray(data) ? data : data.heists || data.data || [];
         setHeists(arr);
       })
       .catch((err) => console.error("Error fetching heists data:", err));
@@ -48,11 +46,10 @@ const HorizontalGallery = () => {
 
   // const infiniteHeists =
   // heists.length > 0 ? [...heists, ...heists, ...heists] : [];
-  const infiniteHeists =heists
+  const infiniteHeists = heists;
 
   return (
     <CinematicPage>
-
       {/* ✅ FIXED "MY HEISTS" BUTTON */}
       <button
         onClick={() => navigate("/my_heists")}
@@ -74,10 +71,10 @@ const HorizontalGallery = () => {
 
         <Swiper
           modules={[FreeMode, Mousewheel]}
-          direction="horizontal"   // 👈 important
+          direction="horizontal" // 👈 important
           mousewheel={{
             enabled: true,
-            forceToAxis: false,    // 👈 allow vertical wheel to control horizontal
+            forceToAxis: false, // 👈 allow vertical wheel to control horizontal
             sensitivity: 0.8,
             releaseOnEdges: false,
           }}
@@ -94,10 +91,6 @@ const HorizontalGallery = () => {
           loop={false}
           resistance={true}
           resistanceRatio={0.5}
-          resistanceThreshold={100}
-          resistanceSpeed={100}
-          resistanceDelay={100}
-          resistanceDirection="horizontal"
           className="w-full h-full z-10"
         >
           {infiniteHeists.map((item, index) => {
@@ -108,34 +101,32 @@ const HorizontalGallery = () => {
 
             const hashtags =
               item?.section_e?.crew_members?.map(
-                (member) => `# ${member.job} ${member.money_share}`
+                (member) => `# ${member.job} ${member.money_share}`,
               ) || [];
 
             return (
               <SwiperSlide
                 key={`${item.id}-${index}`} // ✅ VERY IMPORTANT (unique key)
                 className="!w-auto h-full !flex justify-center items-center px-[5vw]"
-                slidesPerView="auto"
-                spaceBetween={120}   // 👈 add this
+                // slidesPerView="auto"
+                // spaceBetween={120} // 👈 add this
               >
                 <div
                   className="relative w-fit flex-shrink-0 cursor-pointer group transform-gpu will-change-transform"
                   onClick={() =>
                     setSelectedItem({
-                      ...item,
+                      raw: item, // original API data
                       uniqueIndex: index,
                       _title: title,
                       _hashtags: hashtags,
-                      description:
-                        item.quote || item.short_description || "",
+                      description: item.quote || item.short_description || "",
                     })
                   }
                 >
                   <div
                     className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[100vh] pointer-events-none z-0"
                     style={{
-                      backgroundImage:
-                        "url('/assets/StoneTexture.png')",
+                      backgroundImage: "url('/assets/StoneTexture.png')",
                       backgroundSize: "30rem",
                       backgroundRepeat: "repeat",
                       backgroundPosition: "center",
@@ -149,10 +140,7 @@ const HorizontalGallery = () => {
                   />
 
                   <div className="relative z-0 opacity-0 pointer-events-none">
-                    <HackNiteCard
-                      title={title}
-                      hashtagLines={hashtags}
-                    />
+                    <HackNiteCard title={title} hashtagLines={hashtags} />
                   </div>
 
                   <motion.div
@@ -160,17 +148,15 @@ const HorizontalGallery = () => {
                     className="absolute inset-0 z-10 transition-transform duration-300 group-hover:scale-105"
                     transition={linearTransition}
                   >
-                    <HackNiteCard
-                      title={title}
-                      hashtagLines={hashtags}
-                    />
+                    <HackNiteCard title={title} hashtagLines={hashtags} />
                   </motion.div>
 
                   <div
-                    className={`absolute inset-0 z-20 pointer-events-none transition-all duration-300 group-hover:scale-105 rounded-[inherit] ${selectedItem?.uniqueIndex === index
-                      ? "opacity-0"
-                      : "opacity-100"
-                      }`}
+                    className={`absolute inset-0 z-20 pointer-events-none transition-all duration-300 group-hover:scale-105 rounded-[inherit] ${
+                      selectedItem?.uniqueIndex === index
+                        ? "opacity-0"
+                        : "opacity-100"
+                    }`}
                     style={{
                       background:
                         "radial-gradient(120% 120% at 50% -10%, transparent 30%, rgba(0,0,0,0.5) 75%, rgba(0,0,0,0.95) 100%)",
@@ -212,10 +198,10 @@ const HorizontalGallery = () => {
                   transition={linearTransition}
                   onClick={(e) => {
                     e.stopPropagation();
-                    const hid = selectedItem?.id;
+                    const hid = selectedItem?.raw?.id;
                     if (hid != null) {
-                      navigate(`/heist_description/${hid}`, {
-                        state: { heist: selectedItem },
+                      navigate(`/heist/${hid}`, {
+                        state: { heist: selectedItem.raw },
                       });
                     }
                   }}

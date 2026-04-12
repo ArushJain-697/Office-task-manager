@@ -101,6 +101,8 @@ const BlackFlash = ({ isNavigating }) => {
           <Route path="/add_post" element={<AddPost />} />
           <Route path="/edit_profile" element={<EditProfile />} />
           <Route path="/my_heists" element={<MyHeists />} />
+          <Route path="/heistsDesc" element={<HeistDescription />} />
+          <Route path="/heist/:id" element={<HeistDescription />} />
         </Routes>
       </AnimatePresence>
 
