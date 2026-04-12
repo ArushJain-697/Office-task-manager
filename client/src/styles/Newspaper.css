@@ -75,14 +75,6 @@ p {
   font-weight: normal;
   font-style: normal;
 }
-.bullets:hover,
-.magGlass:hover {
-  /* Syntax: h-shadow v-shadow blur spread color */
-  /* To create a "solid" outline, use multiple drop-shadows or a very small blur */
-  filter: drop-shadow(0.2em 0em 0em #ffd230) drop-shadow(-0.2em 0em 0em #ffd230)
-    drop-shadow(0em 0.2em 0em #ffd230) drop-shadow(0em -0.2em 0em #ffd230);
-}
-
 /* Smooth scrolling */
 .scrollbar-modern {
   scroll-behavior: smooth;

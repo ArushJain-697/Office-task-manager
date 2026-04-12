@@ -9,6 +9,7 @@ import WantedPoster from "../components/WantedPoster.jsx";
 import { useNavigate } from "react-router-dom";
 import HackNiteNewspaperPoster from "../components/HackNiteNewspaperPoster";
 import WantedProfileFrame from "../components/WantedProfileFrame";
+import InteractionMarker from "../components/InteractionMarker";
 import newsPaperBG from "../../public/assets/Newspaper.png";
 // ==========================================
 // CONFIGURATION: FLIPBOOK ASPECT RATIO
@@ -146,10 +147,9 @@ export default function Newspaper() {
           }`}
         />
 
-        {/* 2. STATIC IMAGE (ON TABLE) */}
         <div
           onClick={() => setIsOpened(true)}
-          className={`absolute transition-all duration-700 z-20 cursor-pointer shadow-2xl ${
+          className={`group absolute transition-all duration-700 z-20 cursor-pointer shadow-2xl ${
             isOpened
               ? "opacity-0 scale-150 blur-xl pointer-events-none"
               : "opacity-100 scale-100 "
@@ -163,9 +163,17 @@ export default function Newspaper() {
         >
           <img
             src="/assets/frontPageBG.jpeg"
-            className="hover:border-8 p-2 border-amber-300 max-w-[35vw] z-20"
+            className="p-2 max-w-[35vw] z-20"
             alt="newspaper-folded"
           />
+          {!isOpened && (
+             <InteractionMarker 
+               className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" 
+               baseScale={1.5} 
+               onClick={() => setIsOpened(true)} 
+               text="READ"
+             />
+          )}
         </div>
 
         {/* 3. THE ACTUAL BOOK */}
@@ -203,12 +211,11 @@ export default function Newspaper() {
         )}
 
         <div
-          className={`absolute shadow-2xl origin-center will-change-transform ${
+          className={`group absolute shadow-2xl origin-center will-change-transform ${
             showWantedProfile
               ? "z-70 pointer-events-auto translate-x-0 translate-y-0 scale-[0.70] rotate-0 transition-transform duration-700 ease-in-out"
-              : `z-20 cursor-pointer pointer-events-auto translate-x-[36vw] -translate-y-[24vh] scale-[0.30] rotate-15 border-4 border-stone-800
-         transition-transform duration-400 ease-in-out
-         ${!showWantedProfile ? "hover:scale-[0.28] hover:border-12 p-4 hover:border-amber-400" : ""}
+              : `z-20 cursor-pointer pointer-events-auto translate-x-[36vw] -translate-y-[24vh] scale-[0.30] rotate-0 border-4 border-stone-800
+         transition-transform duration-400 ease-in-out p-4
          ${isOpened ? "opacity-0 pointer-events-none blur-xl" : "opacity-100"}`
           }`}
           onClick={() => {
@@ -217,8 +224,16 @@ export default function Newspaper() {
         >
           <WantedProfileFrame
             profile={wantedProfileData}
-            className="pointer-events-none"
+            className="pointer-events-none relative"
           />
+          {!showWantedProfile && (
+             <InteractionMarker 
+               className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" 
+               baseScale={4.0}
+               onClick={() => setShowWantedProfile(true)} 
+               text="READ"
+             />
+          )}
 
           {showWantedProfile && (
             <div className="pointer-events-auto absolute -bottom-24 left-1/2 -translate-x-1/2 flex gap-4">
@@ -264,20 +279,36 @@ export default function Newspaper() {
           )}
         </div>
 
-        <img
-          src="/assets/MagnifyingGlass.png"
-          alt="Search"
-          onClick={() => navigate("/Heists")}
-          draggable={false}
-          className="magGlass absolute right-20 z-19 bottom-15 rotate-90 max-w-50 box-content cursor-pointer hover:scale-110 transition-transform duration-300"
-        />
-        <img
-          src="/assets/handshake.png"
-          alt="connections"
-          onClick={() => navigate("/connections")}
-          draggable={false}
-          className="magGlass absolute left-20 z-19 top-15 rotate-0 max-w-60 box-content cursor-pointer hover:scale-110 transition-transform duration-300"
-        />
+        <div className="group absolute right-20 z-19 bottom-15 rotate-90 max-w-50 box-content">
+          <img
+            src="/assets/MagnifyingGlass.png"
+            alt="Search"
+            onClick={() => navigate("/Heists")}
+            draggable={false}
+            className="w-full cursor-pointer"
+          />
+          <InteractionMarker 
+            className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-90" 
+            baseScale={1.0} 
+            onClick={() => navigate("/Heists")} 
+            text="HEISTS"
+          />
+        </div>
+        <div className="group absolute left-20 z-19 top-15 rotate-0 max-w-60 box-content">
+          <img
+            src="/assets/handshake.png"
+            alt="connections"
+            onClick={() => navigate("/connections")}
+            draggable={false}
+            className="w-full cursor-pointer"
+          />
+          <InteractionMarker 
+            className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" 
+            baseScale={1.7} 
+            onClick={() => navigate("/connections")} 
+            text="CONNECTIONS"
+          />
+        </div>
 
         <img
           src="/assets/bullets.png"
@@ -286,21 +317,23 @@ export default function Newspaper() {
           className="bullets absolute left-70 z-19 bottom-10 rotate-160 max-w-25 p-1 box-content "
         />
         {role === "sicario" && (
-          <img
-            src="/assets/pen.png"
-            alt="write post"
-            onClick={() => navigate("/add_post")}
-            draggable={false}
-            className={`absolute left-[62vw] rotate-310 cursor-pointer z-20 
-    transition-transform duration-300 ease-in-out
-    hover:transition-none hover:scale-[1.15] 
-    hover:drop-shadow-[4px_0_0_rgba(251,191,36,1)]
-    hover:drop-shadow-[-4px_0_0_rgba(251,191,36,1)]
-    hover:drop-shadow-[0_4px_0_rgba(251,191,36,1)]
-    hover:drop-shadow-[0_-4px_0_rgba(251,191,36,1)]
-    w-50
-    ${isOpened ? "opacity-0 pointer-events-none blur-xl" : "opacity-100"}`}
-          />
+          <div 
+             className={`group absolute left-[62vw] top-[50vh] rotate-310 z-20 w-50 ${isOpened ? "opacity-0 pointer-events-none blur-xl" : "opacity-100"}`}
+          >
+            <img
+              src="/assets/pen.png"
+              alt="write post"
+              onClick={() => navigate("/add_post")}
+              draggable={false}
+              className="w-full cursor-pointer"
+            />
+            <InteractionMarker 
+               className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[50deg]" 
+               baseScale={1.0} 
+               onClick={() => navigate("/add_post")} 
+               text="POST"
+            />
+          </div>
         )}
         <EvidenceGun />
       </div>

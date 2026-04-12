@@ -9,6 +9,8 @@ import {
 } from "@react-three/drei";
 import { motion, AnimatePresence } from "framer-motion";
 import * as THREE from "three";
+import InteractionMarker from "./InteractionMarker";
+
 // 1. GUN MESH (No more post-processing wrappers!)
 function GunMesh({ isZoomed, setIsZoomed, setHovered }) {
   const stats = React.useMemo(
@@ -65,13 +67,6 @@ function GunMesh({ isZoomed, setIsZoomed, setHovered }) {
         setHovered(false);
         document.body.style.cursor = "auto";
       }}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (!isZoomed) {
-          setIsZoomed(true);
-          setHovered(false); // Turn off outline when opened
-        }
-      }}
     >
       <primitive object={scene} />
 
@@ -120,57 +115,6 @@ export default function EvidenceGun() {
 
   return (
     <>
-      {/* --- THE SVG FILTER CHEAT CODE --- */}
-      {/* This sits invisibly on the page and creates the math for our "Gap Outline" */}
-      <svg
-        style={{
-          position: "absolute",
-          width: 0,
-          height: 0,
-          pointerEvents: "none",
-        }}
-        aria-hidden="true"
-      >
-        <filter id="gap-outline">
-          {/* 1. Make a thick mask (4px) for the total size of the border */}
-          <feMorphology
-            in="SourceAlpha"
-            operator="dilate"
-            radius="6"
-            result="outerEdge"
-          />
-          {/* 2. Make a thinner mask (2px) for the empty gap space */}
-          <feMorphology
-            in="SourceAlpha"
-            operator="dilate"
-            radius="3"
-            result="innerGap"
-          />
-
-          {/* 3. Color the thick mask Yellow */}
-          <feFlood floodColor="#ffd230" result="yellowColor" />
-          <feComposite
-            in="yellowColor"
-            in2="outerEdge"
-            operator="in"
-            result="yellowBorder"
-          />
-
-          {/* 4. Use the thin mask to "punch a hole" out of the yellow border */}
-          <feComposite
-            in="yellowBorder"
-            in2="innerGap"
-            operator="out"
-            result="finalBorder"
-          />
-
-          {/* 5. Put the original 3D canvas back on top of the new border */}
-          <feMerge>
-            <feMergeNode in="finalBorder" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </svg>
       {/* ----------------------------------- */}
 
       <AnimatePresence>
@@ -187,8 +131,6 @@ export default function EvidenceGun() {
       <div
         // Notice we removed "transition-all duration-200" so the hover is INSTANT
         className={`absolute inset-0 ${isZoomed ? "z-50" : "z-10"}`}
-        // If hovered and on the table, apply our custom SVG filter!
-        style={{ filter: hovered && !isZoomed ? "url(#gap-outline)" : "none" }}
       >
         <Canvas
           camera={{ position: [0, 0, 5], fov: 50 }}
@@ -209,6 +151,20 @@ export default function EvidenceGun() {
             setIsZoomed={setIsZoomed}
             setHovered={setHovered}
           />
+
+          {!isZoomed && (
+            <Html position={[-3.8, -1.2, 0.5]} center zIndexRange={[100, 0]}>
+              <InteractionMarker
+                onClick={() => {
+                  setIsZoomed(true);
+                  setHovered(false);
+                }}
+                baseScale={1.0}
+                forceVisible={hovered}
+                text="STATS"
+              />
+            </Html>
+          )}
 
           <OrbitControls
             ref={controlsRef}
