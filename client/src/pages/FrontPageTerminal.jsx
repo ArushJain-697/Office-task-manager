@@ -173,7 +173,7 @@ export default function FrontPageTerminal() {
             // SUCCESS! The cookie is now set by the browser.
             startTypedAnimation(
               [`<br/>ACCESS GRANTED. Welcome, ^500${data.user.username}`],
-              () => navigate("/feed"),
+              () => navigate("/Heists"),
             );
           })
           .catch((error) => {
@@ -203,46 +203,49 @@ export default function FrontPageTerminal() {
 
         startTypedAnimation(["<br/>CREATING IDENTITY... ^800 "]);
 
-        fetch(`${apiBaseUrl}/api/auth/register`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include", // REQUIRES COOKIES
-          // This is the data he is sending to your backend
-          body: JSON.stringify({
-            username: loginData.username,
-            password: password,
-            role: userRole,
-          }),
-        })
-          .then(async (response) => {
-            const data = await response.json();
-            if (!response.ok) {
-              // This will catch Edge Guard 'error' or authController 'message'
-              throw new Error(
-                data?.error ||
-                  data?.message ||
-                  `Registration failed: ${response.status}`,
-              );
-            }
-            return data;
-          })
-          .then((data) => {
-            startTypedAnimation(
-              [
-                `<br/>REGISTRATION COMPLETE. Welcome, ^500${data.user.username}`,
-              ],
-              () => navigate("/feed"),
-            );
-          })
-          .catch((error) => {
-            console.error("Registration error:", error);
-            startTypedAnimation([
-              `<br/>REGISTRATION FAILED: ${error.message}. ^800 <br/>> Type "Login" or "Sign Up": `,
-            ]);
-            setCurrentStep("COMMAND");
-            setIsProcessingInput(false);
+        // Pre-flight logout clearance
+        fetch(`${apiBaseUrl}/api/auth/logout`, { credentials: "include" })
+          .catch(() => {}) // gracefully consume logout ping failures silently
+          .finally(() => {
+            fetch(`${apiBaseUrl}/api/auth/register`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include", // REQUIRES COOKIES
+              body: JSON.stringify({
+                username: loginData.username,
+                password: password,
+                role: userRole,
+              }),
+            })
+              .then(async (response) => {
+                const data = await response.json();
+                if (!response.ok) {
+                  throw new Error(
+                    data?.error ||
+                      data?.message ||
+                      `Registration failed: ${response.status}`,
+                  );
+                }
+                return data;
+              })
+              .then((data) => {
+                startTypedAnimation(
+                  [
+                    `<br/>REGISTRATION COMPLETE. Welcome, ^500${data.user.username}`,
+                  ],
+                  () => navigate("/feed"),
+                );
+              })
+              .catch((error) => {
+                console.error("Registration error:", error);
+                startTypedAnimation([
+                  `<br/>REGISTRATION FAILED: ${error.message}. ^800 <br/>> Type "Login" or "Sign Up": `,
+                ]);
+                setCurrentStep("COMMAND");
+                setIsProcessingInput(false);
+              });
           });
       } else {
         setIsProcessingInput(false);

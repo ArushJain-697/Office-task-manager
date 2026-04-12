@@ -8,6 +8,7 @@ import LoadingScreen from "../components/LoadingScreen.jsx";
 import WantedPoster from "../components/WantedPoster.jsx";
 import { useNavigate } from "react-router-dom";
 import HackNiteNewspaperPoster from "../components/HackNiteNewspaperPoster";
+import WantedProfileFrame from "../components/WantedProfileFrame";
 
 // ==========================================
 // CONFIGURATION: FLIPBOOK ASPECT RATIO
@@ -41,6 +42,28 @@ export default function Newspaper() {
   const bookRef = useRef(null);
 
   const [postChunks, setPostChunks] = useState([]);
+  const [role, setRole] = useState(null);
+  const [wantedProfileData, setWantedProfileData] = useState(null);
+  const [showWantedProfile, setShowWantedProfile] = useState(false);
+
+  useEffect(() => {
+    fetch("https://api.sicari.works/api/auth/me", { credentials: "include" })
+      .then(res => res.json())
+      .then(data => {
+        const userRole = data?.user?.role || data?.role;
+        setRole(userRole);
+        if (userRole === "sicario" || userRole === "fixer") {
+          const endpoint = userRole === "sicario" ? "api/sicario/profile" : "api/fixer/profile";
+          fetch(`https://api.sicari.works/${endpoint}`, { credentials: "include" })
+            .then(r => r.json())
+            .then(d => {
+              setWantedProfileData(d?.profile || d?.data || d);
+            })
+            .catch(() => {});
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -130,6 +153,7 @@ export default function Newspaper() {
             }`}
         >
           <HTMLFlipBook
+            key={`flipbook-${postChunks.length}`}
             width={dimensions.width}
             height={dimensions.height}
             showCover={false}
@@ -144,12 +168,33 @@ export default function Newspaper() {
           </HTMLFlipBook>
         </div>
 
-        <img
-          src="/assets/wanted.jpeg"
-          alt="wanted image"
-          draggable={false}
-          className="absolute right-20 z-19 top-15 rotate-20 max-w-50 p-1 hover:border-2 border-amber-300 hover:scale-110s box-content "
-        />
+        {showWantedProfile && (
+           <div 
+             className="fixed inset-0 bg-black/80 z-[60] backdrop-blur-md cursor-pointer pointer-events-auto" 
+             onClick={() => setShowWantedProfile(false)} 
+           />
+        )}
+        
+        <div
+          className={`absolute shadow-2xl transform origin-center transition-[transform,opacity] ${
+            showWantedProfile 
+              ? "z-[70] duration-[800ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] pointer-events-auto translate-x-0 translate-y-0 scale-[0.70] rotate-0" 
+              : `z-20 duration-[800ms] hover:duration-75 cursor-pointer pointer-events-auto translate-x-[30vw] -translate-y-[30vh] scale-[0.20] rotate-[15deg] hover:scale-[0.22] border-[4px] border-stone-800 hover:border-[8px] hover:border-amber-400 ${isOpened ? "opacity-0 pointer-events-none blur-xl" : "opacity-100"}`
+          }`}
+          onClick={() => { if (!showWantedProfile) setShowWantedProfile(true); }}
+        >
+          <WantedProfileFrame profile={wantedProfileData} className="pointer-events-none" />
+          
+          {showWantedProfile && (
+            <button
+               className="pointer-events-auto absolute -bottom-24 left-[40%] -translate-x-1/2 bg-stone-900 bg-opacity-95 text-[#f0e8d0] px-8 py-3 font-bold tracking-[0.2em] text-3xl border-8 border-amber-300 hover:bg-stone-800 hover:scale-102 shadow-[0_10px_30px_black]"
+               onClick={(e) => { e.stopPropagation(); navigate('/edit_profile'); }}
+            >
+              EDIT PROFILE
+            </button>
+          )}
+        </div>
+
         <img
           src="/assets/MagnifyingGlass.png"
           alt="Search"
@@ -164,6 +209,15 @@ export default function Newspaper() {
           draggable={false}
           className="bullets absolute left-20 z-19 bottom-15 rotate-160 max-w-50 p-1 box-content "
         />
+        {role === "sicario" && (
+          <img
+            src="/assets/pen.png"
+            alt="write post"
+            onClick={() => navigate("/add_post")}
+            draggable={false}
+            className={`absolute left-[30vw] top-[10vh] cursor-pointer z-20 transition-all duration-300 hover:scale-[1.15] w-[80px] ${isOpened ? "opacity-0 pointer-events-none blur-xl" : "opacity-100"}`}
+          />
+        )}
         <EvidenceGun />
       </div>
     </CinematicPage>
@@ -186,6 +240,7 @@ function SinglePage({ posts = [], pageNum = 1 }) {
         bodyColumn={topPost.content || topPost.body || "No information available at this time."}
         usernameTop={topPost.author || topPost.username || "Anonymous"}
         topBountyScore={topPost.score}
+        portraitSrc={topPost.image_url || topPost.photoUrl || topPost.photo || topPost.image || topPost.photo_url}
 
         bottomPostId={bottomPost._id || bottomPost.id}
         bottomPostUserVote={bottomPost.userVote || bottomPost.vote}

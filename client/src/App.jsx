@@ -9,11 +9,13 @@ import {
 import FrontPageTerminal from "./pages/FrontPageTerminal";
 import Newspaper from "./pages/Newspaper";
 import { motion, AnimatePresence } from 'framer-motion';
-import WantedPoster from "./components/WantedPoster";
 import HeistsWall from "./pages/HeistsWall";
 import Network from "./pages/Network";
+import AddPost from "./pages/AddPost";
+import EditProfile from "./pages/EditProfile";
 import HackNiteCard from './components/HackNiteCard'
 import HackNiteNewspaperPoster from "./components/HackNiteNewspaperPoster";
+import WantedProfileFrame from "./components/WantedProfileFrame";
 const App = () => {
     const location = useLocation();
     const currentPath = location?.pathname || "/";
@@ -47,10 +49,13 @@ const BlackFlash = ({ isNavigating }) => {
           <Route path="/" element={<FrontPageTerminal />} />
           <Route path="/feed" element={<Newspaper />} />
           <Route path="/Heists" element={<HeistsWall />} />
-          <Route path="/working" element={<WantedPoster />} />
+          <Route path="/working" element={<WantedProfileFrame />} />
           <Route path="/yugpo" element={<HackNiteCard />} />
           <Route path="/Network" element={<Network />} />
           <Route path="/hacknite" element={<HackNiteNewspaperPoster />} />
+          <Route path="/wanted" element={<WantedProfileFrame />} />
+          <Route path="/add_post" element={<AddPost />} />
+          <Route path="/edit_profile" element={<EditProfile />} />
         </Routes>
       </AnimatePresence>
 
