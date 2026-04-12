@@ -170,16 +170,17 @@ export default function Newspaper() {
 
         {showWantedProfile && (
            <div 
-             className="fixed inset-0 bg-black/80 z-[60] backdrop-blur-md cursor-pointer pointer-events-auto" 
+             className="fixed inset-0 z-[60] cursor-pointer pointer-events-auto bg-black/80 backdrop-blur-md transition-opacity duration-700 ease-in-out" 
              onClick={() => setShowWantedProfile(false)} 
+             aria-hidden
            />
         )}
         
         <div
-          className={`absolute shadow-2xl transform origin-center transition-[transform,opacity] ${
+          className={`absolute shadow-2xl origin-center transition-all duration-700 ease-in-out will-change-transform ${
             showWantedProfile 
-              ? "z-[70] duration-[800ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] pointer-events-auto translate-x-0 translate-y-0 scale-[0.70] rotate-0" 
-              : `z-20 duration-[800ms] hover:duration-75 cursor-pointer pointer-events-auto translate-x-[30vw] -translate-y-[30vh] scale-[0.20] rotate-[15deg] hover:scale-[0.22] border-[4px] border-stone-800 hover:border-[8px] hover:border-amber-400 ${isOpened ? "opacity-0 pointer-events-none blur-xl" : "opacity-100"}`
+              ? "z-[70] pointer-events-auto translate-x-0 translate-y-0 scale-[0.70] rotate-0" 
+              : `z-20 cursor-pointer pointer-events-auto translate-x-[30vw] -translate-y-[30vh] scale-[0.20] rotate-[15deg] border-[4px] border-stone-800 hover:scale-[0.22] hover:border-[8px] hover:border-amber-400 ${isOpened ? "opacity-0 pointer-events-none blur-xl" : "opacity-100"}`
           }`}
           onClick={() => { if (!showWantedProfile) setShowWantedProfile(true); }}
         >

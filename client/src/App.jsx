@@ -13,6 +13,7 @@ import HeistsWall from "./pages/HeistsWall";
 import Network from "./pages/Network";
 import AddPost from "./pages/AddPost";
 import EditProfile from "./pages/EditProfile";
+import HeistDescription from "./pages/HeistDescription";
 import HackNiteCard from './components/HackNiteCard'
 import HackNiteNewspaperPoster from "./components/HackNiteNewspaperPoster";
 import WantedProfileFrame from "./components/WantedProfileFrame";
@@ -56,6 +57,7 @@ const BlackFlash = ({ isNavigating }) => {
           <Route path="/wanted" element={<WantedProfileFrame />} />
           <Route path="/add_post" element={<AddPost />} />
           <Route path="/edit_profile" element={<EditProfile />} />
+          <Route path="/heist_description/:id" element={<HeistDescription />} />
         </Routes>
       </AnimatePresence>
 

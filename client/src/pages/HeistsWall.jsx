@@ -183,7 +183,10 @@ const HorizontalGallery = () => {
                   transition={linearTransition}
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate("/heist_description", { state: { heist: selectedItem } });
+                    const hid = selectedItem?.id;
+                    if (hid != null) {
+                      navigate(`/heist_description/${hid}`, { state: { heist: selectedItem } });
+                    }
                   }}
                   className="absolute left-1/2 -translate-x-1/2 -bottom-[9rem] bg-[#2c1303] text-[#f0e8d0] font-['Bungee'] py-[0.75rem] px-[2.5rem] shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:scale-105 active:scale-95 transition-transform"
                   style={{ fontSize: 20, border: "2px solid black", letterSpacing: "1px" }}
