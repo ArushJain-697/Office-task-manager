@@ -20,25 +20,25 @@ const allowedOrigins = [
   "http://localhost:5173",
 ].filter(Boolean);
 
-app.use(
-  cors({
-    origin(origin, callback) {
-      const isDev = process.env.NODE_ENV !== "production";
-      const isLocalDevOrigin =
-        isDev &&
-        (/^http:\/\/localhost:\d+$/.test(origin || "") ||
-          /^http:\/\/127\.0\.0\.1:\d+$/.test(origin || ""));
+// app.use(
+//   cors({
+//     origin(origin, callback) {
+//       const isDev = process.env.NODE_ENV !== "production";
+//       const isLocalDevOrigin =
+//         isDev &&
+//         (/^http:\/\/localhost:\d+$/.test(origin || "") ||
+//           /^http:\/\/127\.0\.0\.1:\d+$/.test(origin || ""));
 
-      if (!origin || allowedOrigins.includes(origin) || isLocalDevOrigin) {
-        callback(null, true);
-        return;
-      }
-      callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-  })
-);
-
+//       if (!origin || allowedOrigins.includes(origin) || isLocalDevOrigin) {
+//         callback(null, true);
+//         return;
+//       }
+//       callback(new Error("Not allowed by CORS"));
+//     },
+//     credentials: true,
+//   })
+// );
+app.use(cors())
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
