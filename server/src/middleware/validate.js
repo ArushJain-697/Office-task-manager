@@ -74,14 +74,17 @@ const heistSchema = z.object({
 
   // Section C: Execution
   execution_description: z.string().trim().min(1).max(3000),
-  // Section C: Timeline
-  timeline: z.array(timelineStepSchema).length(6),
+  // Timeline: min 1 step (do not use .length(6) — in Zod 4 that error reads ">=6 items")
+  timeline: z
+    .array(timelineStepSchema)
+    .min(1, { error: "Timeline must include at least one execution step" })
+    .max(6, { error: "Timeline cannot exceed 6 execution steps" }),
 
   // Section D — Extraction
   extraction_plan: z.string().trim().min(1).max(3000),
 
   // Section E — Crew Manifest
-  crew_members: z.array(crewMemberSchema).min(1),
+  crew_members: z.array(crewMemberSchema).min(1).max(3),
 });
 
 function validateHeist(req, res, next) {

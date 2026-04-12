@@ -166,6 +166,33 @@ const HorizontalGallery = () => {
               </SwiperSlide>
             );
           })}
+          {role === "fixer" && (
+            <SwiperSlide
+              key="add-heist-slide"
+              className="!w-auto h-full !flex justify-center items-center px-[5vw]"
+            >
+              <button
+                type="button"
+                onClick={() => navigate("/add_heist")}
+                className="relative flex h-[507px] w-[381px] flex-shrink-0 cursor-pointer flex-col items-center justify-center border-2 border-black bg-[#2c1303] text-[#f0e8d0] shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-transform hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f0e8d0]"
+                style={{ fontFamily: "Bungee, system-ui, sans-serif" }}
+                aria-label="Add new heist"
+              >
+                <span
+                  className="leading-none"
+                  style={{ fontSize: 120, lineHeight: 1 }}
+                >
+                  +
+                </span>
+                <span
+                  className="mt-4 px-4 text-center"
+                  style={{ fontSize: 14, letterSpacing: "0.06em" }}
+                >
+                  NEW HEIST
+                </span>
+              </button>
+            </SwiperSlide>
+          )}
         </Swiper>
 
         <AnimatePresence>

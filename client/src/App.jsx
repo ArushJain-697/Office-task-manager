@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import HeistsWall from "./pages/HeistsWall";
 import Network from "./pages/Network";
 import AddPost from "./pages/AddPost";
+import AddHeist from "./pages/AddHeist";
 import EditProfile from "./pages/EditProfile";
 import HeistDescription from "./pages/HeistDescription";
 import MyHeists from "./pages/My_Heists";
@@ -99,6 +100,7 @@ const BlackFlash = ({ isNavigating }) => {
           <Route path="/Network" element={<Network />} />
           <Route path="/connections" element={<MyConnections />} />
           <Route path="/add_post" element={<AddPost />} />
+          <Route path="/add_heist" element={<AddHeist />} />
           <Route path="/edit_profile" element={<EditProfile />} />
           <Route path="/my_heists" element={<MyHeists />} />
           <Route path="/heistsDesc" element={<HeistDescription />} />
