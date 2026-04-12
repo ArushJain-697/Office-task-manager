@@ -15,7 +15,12 @@ import AddPost from "./pages/AddPost";
 import EditProfile from "./pages/EditProfile";
 import HeistDescription from "./pages/HeistDescription";
 import ApprovalInterface from "./components/ApprovalInterface";
+<<<<<<< HEAD
 import MyHeists from "./pages/My_Heists";
+=======
+import WantedProfileFrame from "./components/WantedProfileFrame";
+import MyConnections from "./pages/MyConnections";
+>>>>>>> 5ed799e44a7238f5208078ff42833b1681a266e8
 const dummyProfiles = [
   {
     id: 1,
@@ -97,6 +102,7 @@ const BlackFlash = ({ isNavigating }) => {
           <Route path="/feed" element={<Newspaper />} />
           <Route path="/Heists" element={<HeistsWall />} />
           <Route path="/Network" element={<Network />} />
+          <Route path="/connections" element={<MyConnections />} />
           <Route path="/add_post" element={<AddPost />} />
           <Route path="/edit_profile" element={<EditProfile />} />
           <Route path="/heist_description/:id" element={<HeistDescription />} />
