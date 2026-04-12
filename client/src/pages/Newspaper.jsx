@@ -196,7 +196,7 @@ export default function Newspaper() {
 
         {showWantedProfile && (
           <div
-            className="fixed inset-0 z-[60] cursor-pointer pointer-events-auto bg-black/80 backdrop-blur-md transition-opacity duration-700 ease-in-out"
+            className="fixed inset-0 z-60 cursor-pointer pointer-events-auto bg-black/80 backdrop-blur-md transition-opacity duration-700 ease-in-out"
             onClick={() => setShowWantedProfile(false)}
             aria-hidden
           />
@@ -205,8 +205,8 @@ export default function Newspaper() {
         <div
           className={`absolute shadow-2xl origin-center will-change-transform ${
             showWantedProfile
-              ? "z-[70] pointer-events-auto translate-x-0 translate-y-0 scale-[0.70] rotate-0 transition-transform duration-700 ease-in-out"
-              : `z-20 cursor-pointer pointer-events-auto translate-x-[36vw] -translate-y-[24vh] scale-[0.30] rotate-[15deg] border-[4px] border-stone-800
+              ? "z-70 pointer-events-auto translate-x-0 translate-y-0 scale-[0.70] rotate-0 transition-transform duration-700 ease-in-out"
+              : `z-20 cursor-pointer pointer-events-auto translate-x-[36vw] -translate-y-[24vh] scale-[0.30] rotate-15 border-4 border-stone-800
          transition-transform duration-400 ease-in-out
          ${!showWantedProfile ? "hover:scale-[0.28] hover:border-12 p-4 hover:border-amber-400" : ""}
          ${isOpened ? "opacity-0 pointer-events-none blur-xl" : "opacity-100"}`

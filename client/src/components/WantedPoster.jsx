@@ -268,17 +268,30 @@ export default function WantedPoster({ data: propData }) {
               >
                 SKILL SET
               </div>
-              <ul id="skill-list" className="flex flex-col gap-[0.375rem]">
-                {skills.map((skill, i) => (
-                  <li
-                    key={i}
-                    className="flex items-center gap-[0.5rem] font-mono font-bold text-[0.75rem] text-stone-900"
-                  >
-                    <span className="inline-block w-[0.75rem] h-[0.75rem] bg-stone-900 shrink-0" />
-                    {skill}
-                  </li>
-                ))}
-              </ul>
+              <div
+                id="skill-list"
+                className="max-h-[11rem] overflow-y-auto overflow-x-hidden overscroll-contain pr-1 -mr-1
+                  [scrollbar-width:thin]
+                  [scrollbar-color:rgba(87,83,78,0.55)_rgba(231,229,228,0.35)]
+                  [&::-webkit-scrollbar]:w-1
+                  [&::-webkit-scrollbar-track]:rounded-full
+                  [&::-webkit-scrollbar-track]:bg-stone-300/30
+                  [&::-webkit-scrollbar-thumb]:rounded-full
+                  [&::-webkit-scrollbar-thumb]:bg-stone-600/40
+                  hover:[&::-webkit-scrollbar-thumb]:bg-stone-700/55"
+              >
+                <ul className="flex flex-col gap-[0.375rem] pr-0.5">
+                  {(Array.isArray(skills) ? skills : []).map((skill, i) => (
+                    <li
+                      key={i}
+                      className="flex items-center gap-[0.5rem] font-mono font-bold text-[0.75rem] text-stone-900"
+                    >
+                      <span className="inline-block w-[0.75rem] h-[0.75rem] bg-stone-900 shrink-0" />
+                      {skill}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
           </div>

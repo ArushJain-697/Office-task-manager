@@ -59,11 +59,18 @@ const playSound = (type) => {
 const CARRIAGE_STEP_PX = 5.2;
 const MAX_CARRIAGE_PX = 400;
 
+const SKILL_OPTIONS = [
+  'Hacker', 'Driver', 'Sniper', 'Safecracker', 'Locksmith',
+  'Forger', 'Explosives', 'Enforcer', 'Surveillance', 'Pickpocket',
+  'Demolitions', 'Freerunner', 'Pilot', 'Diver', 'Arsonist',
+  'Smuggler', 'Interrogator', 'Disguise', 'Cryptographer', 'Electronics',
+];
+
 export default function EditProfile() {
   const navigate = useNavigate();
   const [dossierData, setDossierData] = useState({
     name: '', title: '', height: '', weight: '', blood_group: '',
-    clearance_level: '', about: '', skills: '', languages: '', photoUrl: null, photoFile: null
+    clearance_level: '', about: '', skills: [], languages: '', photoUrl: null, photoFile: null
   });
 
   const [currentFieldId, setCurrentFieldId] = useState('name');
@@ -81,10 +88,22 @@ export default function EditProfile() {
   const isMultiline = (id) => ['about'].includes(id);
 
   const getOrderedFieldList = () => {
-    return ['name', 'title', 'height', 'weight', 'blood_group', 'clearance_level', 'about', 'skills', 'languages'];
+    return ['name', 'title', 'height', 'weight', 'blood_group', 'clearance_level', 'skills', 'languages', 'about'];
   };
 
-  const getFieldValue = (id) => String(dossierData[id] || '');
+  const getFieldValue = (id) => {
+    if (id === 'skills') return '';
+    return String(dossierData[id] || '');
+  };
+
+  const toggleSkill = (skill) => {
+    playSound('key');
+    setDossierData((prev) => {
+      const has = prev.skills.includes(skill);
+      const skills = has ? prev.skills.filter((s) => s !== skill) : [...prev.skills, skill];
+      return { ...prev, skills };
+    });
+  };
 
   const updateData = (field, value) => {
     setDossierData(prev => ({ ...prev, [field]: value }));
@@ -222,9 +241,8 @@ export default function EditProfile() {
     if (dossierData.clearance_level) formData.append("clearance_level", dossierData.clearance_level);
     if (dossierData.about) formData.append("about", dossierData.about);
 
-    if (dossierData.skills) {
-      const skillsArr = dossierData.skills.split(',').map(s => s.trim()).filter(Boolean);
-      formData.append("skills", JSON.stringify(skillsArr));
+    if (dossierData.skills.length > 0) {
+      formData.append("skills", JSON.stringify(dossierData.skills));
     }
 
     if (dossierData.languages) {
@@ -341,7 +359,44 @@ export default function EditProfile() {
                 <Field id="weight" label="4. WEIGHT:" block />
                 <Field id="blood_group" label="5. BLOOD TYPE:" block />
                 <Field id="clearance_level" label="6. CLEARANCE LEVEL:" block />
-                <Field id="skills" label="7. SKILL SET (COMMA SEPARATED):" block />
+                <div
+                  className="td-field"
+                  style={{ display: 'block', marginBottom: '15px', cursor: 'default' }}
+                  onClick={(e) => { e.stopPropagation(); setCurrentFieldId('skills'); }}
+                  ref={(el) => { fieldRefs.current.skills = el; }}
+                >
+                  <span className="td-field-label">7. SKILL SET (SELECT ANY):</span>
+                  <div
+                    className="flex flex-wrap gap-2 mt-2 max-w-full relative z-[4]"
+                    style={{ fontFamily: 'inherit' }}
+                  >
+                    {SKILL_OPTIONS.map((opt) => {
+                      const on = dossierData.skills.includes(opt);
+                      return (
+                        <button
+                          key={opt}
+                          type="button"
+                          className={
+                            'text-sm px-2.5 py-1 border-2 border-[#1a1a1a] transition-colors ' +
+                            (on ? 'bg-[#1a1a1a] text-[#f4f1e8]' : 'bg-transparent text-[#1a1a1a]')
+                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentFieldId('skills');
+                            toggleSkill(opt);
+                          }}
+                        >
+                          {opt}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {currentFieldId === 'skills' && (
+                    <span className="td-value inline-block mt-1">
+                      <span className="type-cursor" />
+                    </span>
+                  )}
+                </div>
                 <Field id="languages" label="8. LANGUAGES (COMMA SEPARATED):" block />
                 <br />
                 <Field id="about" label="9. ABOUT ME:" block />
@@ -376,7 +431,9 @@ export default function EditProfile() {
         <textarea
           ref={hiddenInputRef}
           value={getFieldValue(currentFieldId)}
+          readOnly={currentFieldId === 'skills'}
           onChange={(e) => {
+            if (currentFieldId === 'skills') return;
             const newVal = e.target.value;
             updateData(currentFieldId, newVal);
             const lines = newVal.split('\n');
