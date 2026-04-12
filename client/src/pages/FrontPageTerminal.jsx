@@ -108,7 +108,7 @@ export default function FrontPageTerminal() {
           setUserInput("");
           setCurrentStep("ID");
           startTypedAnimation([
-            "<br/>>ACCESSING DATABASE... ^500 <br/>> ENTER Sicario ID: ",
+            "<br/>>ACCESSING DATABASE... ^500 <br/>> ENTER Username: ",
           ]);
           setIsProcessingInput(false);
         } else if (input.toLowerCase() === "sign up") {
@@ -119,7 +119,7 @@ export default function FrontPageTerminal() {
           setUserInput("");
           setCurrentStep("ID_signup");
           startTypedAnimation([
-            "<br/>WELCOME !... ^500 <br/>> ENTER Sicario ID: ",
+            "<br/>WELCOME !... ^500 <br/>> ENTER Username: ",
           ]);
           setIsProcessingInput(false);
         } else {
@@ -131,7 +131,7 @@ export default function FrontPageTerminal() {
         }
       } else if (currentStep === "ID") {
         // Login Flow: Save ID and move to Password
-        setTerminalHistory((prev) => [...prev, `> ENTER Sicario ID: ${input}`]);
+        setTerminalHistory((prev) => [...prev, `> ENTER Username: ${input}`]);
         setLoginData((prev) => ({ ...prev, username: input }));
         setUserInput("");
         setCurrentStep("PASS");
@@ -187,7 +187,7 @@ export default function FrontPageTerminal() {
           });
       } else if (currentStep === "ID_signup") {
         // Sign Up Flow: Save ID and move to Password
-        setTerminalHistory((prev) => [...prev, `> ENTER sicario ID: ${input}`]);
+        setTerminalHistory((prev) => [...prev, `> ENTER Username: ${input}`]);
         setLoginData({ username: input, pass: "" }); // Set new username
         setUserInput("");
         setCurrentStep("PASS_signup");
