@@ -173,7 +173,7 @@ export default function FrontPageTerminal() {
             // SUCCESS! The cookie is now set by the browser.
             startTypedAnimation(
               [`<br/>ACCESS GRANTED. Welcome, ^500${data.user.username}`],
-              () => navigate("/Heists"),
+              () => navigate("/feed"),
             );
           })
           .catch((error) => {
