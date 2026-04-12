@@ -387,9 +387,7 @@ function FrontPage() {
                 <p className="newsContent text-justify">
                   Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
                   numquam quaerat ipsnsectetur adipisicing elit. Aliquam neque
-                  tempore cupiditate, asperiores doloribus co Lorem ipsum dolor
-                  sit amet. Lorem ipsum dolor sit amet.nsequatur ab inventore
-                  dolorem it. Tempore, nobis.modi earum optio quia ut, quis
+                  tempore cupiobis.modi earum optio quia ut, quis
                   ectus quidem pariatur recusandae odio rem?
                 </p>
               </div>
