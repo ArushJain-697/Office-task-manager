@@ -22,13 +22,13 @@ function GunMesh({ isZoomed, setIsZoomed, setHovered }) {
   const { scene } = useGLTF("/assets/gun.glb");
   const gunGroupRef = useRef();
 
-  const tablePosition = [-3, 1, 0];
+  const tablePosition = [-3.8, -1.2, 0];
   const inspectPosition = [0, 0, 0];
 
-  const tableRotation = [-0.1, 0.3, 0];
+  const tableRotation = [-0.1, 0.3, -0.8];
   const inspectRotation = [0, 0, 0];
 
-  const tableScale = 0.45;
+  const tableScale = 0.3;
   const inspectScale = 0.8; // (You can increase this if it's too small when inspecting)
 
   useFrame(() => {

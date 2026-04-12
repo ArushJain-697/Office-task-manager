@@ -156,7 +156,7 @@ export default function Newspaper() {
           }`}
           style={{
             transform: !isOpened
-              ? "rotate(45deg) scale(0.5) translate(15vw, 10vh)"
+              ? "rotate(0deg) scale(0.9) translate(0vw, 0vh)"
               : "none",
             transformOrigin: "center center",
           }}
@@ -174,7 +174,7 @@ export default function Newspaper() {
           className={`relative transition-all duration-700 z-30 ${
             isOpened
               ? "opacity-100 scale-100 blur-0"
-              : "opacity-0 rotate-45 scale-75 blur-lg pointer-events-none"
+              : "opacity-0 rotate-0 scale-75 blur-lg pointer-events-none"
           }`}
         >
           <HTMLFlipBook
@@ -269,14 +269,21 @@ export default function Newspaper() {
           alt="Search"
           onClick={() => navigate("/Heists")}
           draggable={false}
-          className="magGlass absolute right-20 z-19 bottom-15 rotate-30 max-w-50 box-content cursor-pointer hover:scale-110 transition-transform duration-300"
+          className="magGlass absolute right-20 z-19 bottom-15 rotate-90 max-w-50 box-content cursor-pointer hover:scale-110 transition-transform duration-300"
+        />
+        <img
+          src="/assets/handshake.png"
+          alt="Search"
+          onClick={() => navigate("/Heists")}
+          draggable={false}
+          className="magGlass absolute left-20 z-19 top-15 rotate-0 max-w-60 box-content cursor-pointer hover:scale-110 transition-transform duration-300"
         />
 
         <img
           src="/assets/bullets.png"
           alt="wanted image"
           draggable={false}
-          className="bullets absolute left-20 z-19 bottom-15 rotate-160 max-w-50 p-1 box-content "
+          className="bullets absolute left-70 z-19 bottom-10 rotate-160 max-w-25 p-1 box-content "
         />
         {role === "sicario" && (
           <img
@@ -284,7 +291,7 @@ export default function Newspaper() {
             alt="write post"
             onClick={() => navigate("/add_post")}
             draggable={false}
-            className={`absolute left-[40vw] top-[10vh] cursor-pointer z-20 
+            className={`absolute left-[62vw] rotate-310 cursor-pointer z-20 
     transition-transform duration-300 ease-in-out
     hover:transition-none hover:scale-[1.15] 
     hover:drop-shadow-[4px_0_0_rgba(251,191,36,1)]
