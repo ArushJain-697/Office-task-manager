@@ -424,7 +424,7 @@ export default function EditProfile() {
             disabled={lockState !== 'idle'}
             onClick={handlePublish}
           >
-            📝 COMMIT PROFILE EDITS
+             COMMIT PROFILE EDITS
           </button>
         </div>
 
