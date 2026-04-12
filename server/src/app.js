@@ -9,7 +9,7 @@ const postRoutes = require("./routes/postRoutes");
 const sicarioRoutes = require("./routes/sicarioRoutes");
 const fixerRoutes = require("./routes/fixerRoutes");
 const connectionRoutes = require("./routes/connectionRoutes");
-const userRoutes = require("./routes/userRoutes");
+const userRoutes = require("../routes/userRoutes");
 
 const app = express();
 

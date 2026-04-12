@@ -77,35 +77,67 @@ async function initDatabase() {
     )
   `);
 
+  // =============================================
+  // HEISTS — New Schema (Dossier Format)
+  // =============================================
   await pool.query(`
     CREATE TABLE IF NOT EXISTS heists (
       id INT AUTO_INCREMENT PRIMARY KEY,
       fixer_id INT NOT NULL,
-      title VARCHAR(200) NOT NULL,
-      description TEXT NOT NULL,
-      required_skills JSON NOT NULL,
-      heading VARCHAR(200),
-      subheading VARCHAR(200),
+
+      -- Section A: Mission Overview
+      operation_name VARCHAR(200) NOT NULL,
+      place VARCHAR(200) NOT NULL,
+      target VARCHAR(200) NOT NULL,
+      introduction TEXT NOT NULL,
       quote TEXT,
-      timeline VARCHAR(500),
-      crew_details JSON,
-      photos JSON,
-      short_description TEXT,
-      payout INT NOT NULL DEFAULT 0,
+
+      -- Section B: Reconnaissance
+      phase1_name VARCHAR(200) NOT NULL,
+      phase1_description TEXT NOT NULL,
+      phase1_photo_url VARCHAR(500),
+      phase1_photo_public_id VARCHAR(255),
+      intel JSON NOT NULL,
+
+      -- Section C: Execution
+      execution_description TEXT NOT NULL,
+      execution_photo_url VARCHAR(500),
+      execution_photo_public_id VARCHAR(255),
+      timeline JSON NOT NULL,
+
+      -- Section D: Extraction
+      extraction_plan TEXT NOT NULL,
+      extraction_photo_url VARCHAR(500),
+      extraction_photo_public_id VARCHAR(255),
+
+      -- Section E: Crew Manifest
+      crew_members JSON NOT NULL,
+
       status VARCHAR(50) DEFAULT 'open',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (fixer_id) REFERENCES users(id) ON DELETE CASCADE
     )
   `);
 
-  await ensureColumnExists("heists", "heading", "VARCHAR(200)");
-  await ensureColumnExists("heists", "subheading", "VARCHAR(200)");
+  // Migrate old heists table if columns are missing (safe for existing deployments)
+  await ensureColumnExists("heists", "operation_name", "VARCHAR(200) NOT NULL DEFAULT ''");
+  await ensureColumnExists("heists", "place", "VARCHAR(200) NOT NULL DEFAULT ''");
+  await ensureColumnExists("heists", "target", "VARCHAR(200) NOT NULL DEFAULT ''");
+  await ensureColumnExists("heists", "introduction", "TEXT");
   await ensureColumnExists("heists", "quote", "TEXT");
-  await ensureColumnExists("heists", "timeline", "VARCHAR(500)");
-  await ensureColumnExists("heists", "crew_details", "JSON");
-  await ensureColumnExists("heists", "photos", "JSON");
-  await ensureColumnExists("heists", "short_description", "TEXT");
-  await ensureColumnExists("heists", "payout", "INT NOT NULL DEFAULT 0");
+  await ensureColumnExists("heists", "phase1_name", "VARCHAR(200)");
+  await ensureColumnExists("heists", "phase1_description", "TEXT");
+  await ensureColumnExists("heists", "phase1_photo_url", "VARCHAR(500)");
+  await ensureColumnExists("heists", "phase1_photo_public_id", "VARCHAR(255)");
+  await ensureColumnExists("heists", "intel", "JSON");
+  await ensureColumnExists("heists", "execution_description", "TEXT");
+  await ensureColumnExists("heists", "execution_photo_url", "VARCHAR(500)");
+  await ensureColumnExists("heists", "execution_photo_public_id", "VARCHAR(255)");
+  await ensureColumnExists("heists", "timeline", "JSON");
+  await ensureColumnExists("heists", "extraction_plan", "TEXT");
+  await ensureColumnExists("heists", "extraction_photo_url", "VARCHAR(500)");
+  await ensureColumnExists("heists", "extraction_photo_public_id", "VARCHAR(255)");
+  await ensureColumnExists("heists", "crew_members", "JSON");
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS sicario_profiles (

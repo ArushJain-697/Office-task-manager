@@ -16,10 +16,14 @@ const upload = multer({
   fileFilter,
 });
 
-// Single photo — profile aur feed ke liye
+// Single photo — profile and feed
 const uploadSingle = upload.single("photo");
 
-// Multiple photos — heist ke liye (max 3)
-const uploadHeistPhotos = upload.array("photos", 3);
+// 3 named photo slots for heist dossier sections B, C, D
+const uploadHeistPhotos = upload.fields([
+  { name: "phase1_photo", maxCount: 1 },
+  { name: "execution_photo", maxCount: 1 },
+  { name: "extraction_photo", maxCount: 1 },
+]);
 
 module.exports = { uploadSingle, uploadHeistPhotos };
