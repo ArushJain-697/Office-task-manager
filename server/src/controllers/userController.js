@@ -88,16 +88,61 @@ exports.getPublicProfile = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
+    const viewerId = req.user.sub;
+
     const [users] = await pool.query(
       `SELECT 
         u.id, u.username, u.role,
         sp.name, sp.title, sp.clearance_level, sp.photo_url
        FROM users u
        LEFT JOIN sicario_profiles sp ON sp.user_id = u.id
-       ORDER BY u.created_at DESC`
+       WHERE u.id != ?
+       ORDER BY u.created_at DESC`,
+      [viewerId]
     );
 
-    return res.json({ users });
+    // Connection status for each user
+    const [connections] = await pool.query(
+      `SELECT id, requester_id, receiver_id, status
+       FROM connections
+       WHERE requester_id = ? OR receiver_id = ?`,
+      [viewerId, viewerId]
+    );
+
+    const connMap = {};
+    connections.forEach((c) => {
+      const otherId = c.requester_id === viewerId ? c.receiver_id : c.requester_id;
+      connMap[otherId] = {
+        connection_id: c.id,
+        status: c.status,
+        requester_id: c.requester_id,
+      };
+    });
+
+    const result = users.map((u) => {
+      const conn = connMap[u.id];
+      let connection_status = "none";
+      let connection_id = null;
+
+      if (conn) {
+        connection_id = conn.connection_id;
+        if (conn.status === "accepted") {
+          connection_status = "connected";
+        } else if (conn.status === "pending") {
+          connection_status = conn.requester_id === viewerId ? "sent" : "received";
+        } else {
+          connection_status = "declined";
+        }
+      }
+
+      return {
+        ...u,
+        connection_status,
+        connection_id,
+      };
+    });
+
+    return res.json({ users: result });
   } catch (error) {
     console.error("Error fetching users:", error);
     return res.status(500).json({ message: "Internal server error" });
