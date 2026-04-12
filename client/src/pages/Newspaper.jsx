@@ -21,11 +21,17 @@ const PAGE_ASPECT_RATIO = 0.75; // Width is 65% of the Height
 // 1. MOVED OUTSIDE: This prevents React from destroying the pages on every click!
 const Page = React.forwardRef((props, ref) => {
   return props.front === false ? (
-    <div className="demoPage bg-contain select-none z-3 overflow-hidden" ref={ref}>
+    <div
+      className="demoPage bg-contain select-none z-3 overflow-hidden"
+      ref={ref}
+    >
       <SinglePage posts={props.posts} pageNum={props.pageNum} />
     </div>
   ) : (
-    <div className="demoPage bg-contain select-none z-3 overflow-hidden" ref={ref}>
+    <div
+      className="demoPage bg-contain select-none z-3 overflow-hidden"
+      ref={ref}
+    >
       <FrontPage />
     </div>
   );
@@ -34,7 +40,7 @@ const Page = React.forwardRef((props, ref) => {
 export default function Newspaper() {
   const navigate = useNavigate();
   const [dimensions, setDimensions] = useState({
-    width: (window.innerHeight * (PAGE_HEIGHT_VH / 100)) * PAGE_ASPECT_RATIO,
+    width: window.innerHeight * (PAGE_HEIGHT_VH / 100) * PAGE_ASPECT_RATIO,
     height: window.innerHeight * (PAGE_HEIGHT_VH / 100),
   });
 
@@ -48,15 +54,20 @@ export default function Newspaper() {
 
   useEffect(() => {
     fetch("https://api.sicari.works/api/auth/me", { credentials: "include" })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         const userRole = data?.user?.role || data?.role;
         setRole(userRole);
         if (userRole === "sicario" || userRole === "fixer") {
-          const endpoint = userRole === "sicario" ? "api/sicario/profile" : "api/fixer/profile";
-          fetch(`https://api.sicari.works/${endpoint}`, { credentials: "include" })
-            .then(r => r.json())
-            .then(d => {
+          const endpoint =
+            userRole === "sicario"
+              ? "api/sicario/profile"
+              : "api/fixer/profile";
+          fetch(`https://api.sicari.works/${endpoint}`, {
+            credentials: "include",
+          })
+            .then((r) => r.json())
+            .then((d) => {
               setWantedProfileData(d?.profile || d?.data || d);
             })
             .catch(() => {});
@@ -67,9 +78,9 @@ export default function Newspaper() {
 
   useEffect(() => {
     const handleResize = () => {
-      // Strict aspect ratio enforcement 
+      // Strict aspect ratio enforcement
       setDimensions({
-        width: (window.innerHeight * (PAGE_HEIGHT_VH / 100)) * PAGE_ASPECT_RATIO,
+        width: window.innerHeight * (PAGE_HEIGHT_VH / 100) * PAGE_ASPECT_RATIO,
         height: window.innerHeight * (PAGE_HEIGHT_VH / 100),
       });
     };
@@ -83,7 +94,9 @@ export default function Newspaper() {
     })
       .then((res) => res.json())
       .then((data) => {
-        const posts = Array.isArray(data) ? data : data.posts || data.data || [];
+        const posts = Array.isArray(data)
+          ? data
+          : data.posts || data.data || [];
         const chunks = [];
         for (let i = 0; i < posts.length; i += 2) {
           chunks.push(posts.slice(i, i + 2));
@@ -99,13 +112,23 @@ export default function Newspaper() {
   const pagesArray = [
     <Page key="front" front={true} />,
     ...displayPages.map((chunk, idx) => (
-      <Page key={`flip-page-${idx}`} front={false} posts={chunk} pageNum={idx + 1} />
-    ))
+      <Page
+        key={`flip-page-${idx}`}
+        front={false}
+        posts={chunk}
+        pageNum={idx + 1}
+      />
+    )),
   ];
 
   if (isOddLength) {
     pagesArray.push(
-      <Page key="odd-pad" front={false} posts={[]} pageNum={displayPages.length + 1} />
+      <Page
+        key="odd-pad"
+        front={false}
+        posts={[]}
+        pageNum={displayPages.length + 1}
+      />,
     );
   }
 
@@ -117,22 +140,24 @@ export default function Newspaper() {
         {/* 1. DARK OVERLAY */}
         <div
           onClick={() => setIsOpened(false)}
-          className={` fixed inset-0 bg-black/70 transition-all duration-700 z-20 ${isOpened
+          className={` fixed inset-0 bg-black/70 transition-all duration-700 z-20 ${
+            isOpened
               ? "opacity-100 backdrop-blur-md pointer-events-auto"
               : "opacity-0 pointer-events-none backdrop-blur-none"
-            }`}
+          }`}
         />
 
         {/* 2. STATIC IMAGE (ON TABLE) */}
         <div
           onClick={() => setIsOpened(true)}
-          className={`absolute transition-all duration-700 z-20 cursor-pointer shadow-2xl ${isOpened
+          className={`absolute transition-all duration-700 z-20 cursor-pointer shadow-2xl ${
+            isOpened
               ? "opacity-0 scale-150 blur-xl pointer-events-none"
               : "opacity-100 scale-100 "
-            }`}
+          }`}
           style={{
             transform: !isOpened
-              ? "rotate(45deg) scale(0.5) translate(15vw, -10vh)"
+              ? "rotate(45deg) scale(0.5) translate(15vw, 10vh)"
               : "none",
             transformOrigin: "center center",
           }}
@@ -147,10 +172,11 @@ export default function Newspaper() {
         {/* 3. THE ACTUAL BOOK */}
         <div
           onClick={(e) => e.stopPropagation()}
-          className={`relative transition-all duration-700 z-30 ${isOpened
+          className={`relative transition-all duration-700 z-30 ${
+            isOpened
               ? "opacity-100 scale-100 blur-0"
               : "opacity-0 rotate-45 scale-75 blur-lg pointer-events-none"
-            }`}
+          }`}
         >
           <HTMLFlipBook
             key={`flipbook-${postChunks.length}`}
@@ -169,27 +195,38 @@ export default function Newspaper() {
         </div>
 
         {showWantedProfile && (
-           <div 
-             className="fixed inset-0 z-[60] cursor-pointer pointer-events-auto bg-black/80 backdrop-blur-md transition-opacity duration-700 ease-in-out" 
-             onClick={() => setShowWantedProfile(false)} 
-             aria-hidden
-           />
+          <div
+            className="fixed inset-0 z-[60] cursor-pointer pointer-events-auto bg-black/80 backdrop-blur-md transition-opacity duration-700 ease-in-out"
+            onClick={() => setShowWantedProfile(false)}
+            aria-hidden
+          />
         )}
-        
+
         <div
-          className={`absolute shadow-2xl origin-center transition-all duration-700 ease-in-out will-change-transform ${
-            showWantedProfile 
-              ? "z-[70] pointer-events-auto translate-x-0 translate-y-0 scale-[0.70] rotate-0" 
-              : `z-20 cursor-pointer pointer-events-auto translate-x-[30vw] -translate-y-[30vh] scale-[0.20] rotate-[15deg] border-[4px] border-stone-800 hover:scale-[0.22] hover:border-[8px] hover:border-amber-400 ${isOpened ? "opacity-0 pointer-events-none blur-xl" : "opacity-100"}`
+          className={`absolute shadow-2xl origin-center will-change-transform ${
+            showWantedProfile
+              ? "z-[70] pointer-events-auto translate-x-0 translate-y-0 scale-[0.70] rotate-0 transition-transform duration-700 ease-in-out"
+              : `z-20 cursor-pointer pointer-events-auto translate-x-[36vw] -translate-y-[24vh] scale-[0.30] rotate-[15deg] border-[4px] border-stone-800
+         transition-transform duration-400 ease-in-out
+         ${!showWantedProfile ? "hover:scale-[0.28] hover:border-12 p-4 hover:border-amber-400" : ""}
+         ${isOpened ? "opacity-0 pointer-events-none blur-xl" : "opacity-100"}`
           }`}
-          onClick={() => { if (!showWantedProfile) setShowWantedProfile(true); }}
+          onClick={() => {
+            if (!showWantedProfile) setShowWantedProfile(true);
+          }}
         >
-          <WantedProfileFrame profile={wantedProfileData} className="pointer-events-none" />
-          
+          <WantedProfileFrame
+            profile={wantedProfileData}
+            className="pointer-events-none"
+          />
+
           {showWantedProfile && (
             <button
-               className="pointer-events-auto absolute -bottom-24 left-[40%] -translate-x-1/2 bg-stone-900 bg-opacity-95 text-[#f0e8d0] px-8 py-3 font-bold tracking-[0.2em] text-3xl border-8 border-amber-300 hover:bg-stone-800 hover:scale-102 shadow-[0_10px_30px_black]"
-               onClick={(e) => { e.stopPropagation(); navigate('/edit_profile'); }}
+              className="pointer-events-auto absolute -bottom-24 left-[40%] -translate-x-1/2 bg-stone-900 bg-opacity-95 text-[#f0e8d0] px-8 py-3 font-bold tracking-[0.2em] text-3xl border-8 border-amber-300 hover:bg-stone-800 hover:scale-102 shadow-[0_10px_30px_black]"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate("/edit_profile");
+              }}
             >
               EDIT PROFILE
             </button>
@@ -201,7 +238,7 @@ export default function Newspaper() {
           alt="Search"
           onClick={() => navigate("/Heists")}
           draggable={false}
-          className="magGlass absolute right-20 z-19 bottom-15 rotate-130 max-w-50 box-content cursor-pointer hover:scale-110 transition-transform duration-300"
+          className="magGlass absolute right-20 z-19 bottom-15 rotate-30 max-w-50 box-content cursor-pointer hover:scale-110 transition-transform duration-300"
         />
 
         <img
@@ -216,7 +253,15 @@ export default function Newspaper() {
             alt="write post"
             onClick={() => navigate("/add_post")}
             draggable={false}
-            className={`absolute left-[30vw] top-[10vh] cursor-pointer z-20 transition-all duration-300 hover:scale-[1.15] w-[80px] ${isOpened ? "opacity-0 pointer-events-none blur-xl" : "opacity-100"}`}
+            className={`absolute left-[40vw] top-[10vh] cursor-pointer z-20 
+    transition-transform duration-300 ease-in-out
+    hover:transition-none hover:scale-[1.15] 
+    hover:drop-shadow-[4px_0_0_rgba(251,191,36,1)]
+    hover:drop-shadow-[-4px_0_0_rgba(251,191,36,1)]
+    hover:drop-shadow-[0_4px_0_rgba(251,191,36,1)]
+    hover:drop-shadow-[0_-4px_0_rgba(251,191,36,1)]
+    w-50
+    ${isOpened ? "opacity-0 pointer-events-none blur-xl" : "opacity-100"}`}
           />
         )}
         <EvidenceGun />
@@ -234,19 +279,31 @@ function SinglePage({ posts = [], pageNum = 1 }) {
       <HackNiteNewspaperPoster
         volumeLabel="Vol1 , 13"
         pageLabel={`Page : ${pageNum}`}
-
         topPostId={topPost._id || topPost.id}
         topPostUserVote={topPost.userVote || topPost.vote}
         headlineTop={topPost.title || topPost.heading || "REDACTED"}
-        bodyColumn={topPost.content || topPost.body || "No information available at this time."}
+        bodyColumn={
+          topPost.content ||
+          topPost.body ||
+          "No information available at this time."
+        }
         usernameTop={topPost.author || topPost.username || "Anonymous"}
         topBountyScore={topPost.score}
-        portraitSrc={topPost.image_url || topPost.photoUrl || topPost.photo || topPost.image || topPost.photo_url}
-
+        portraitSrc={
+          topPost.image_url ||
+          topPost.photoUrl ||
+          topPost.photo ||
+          topPost.image ||
+          topPost.photo_url
+        }
         bottomPostId={bottomPost._id || bottomPost.id}
         bottomPostUserVote={bottomPost.userVote || bottomPost.vote}
         headlineBottom={bottomPost.title || bottomPost.heading || "REDACTED"}
-        bodyFullWidth={bottomPost.content || bottomPost.body || "No information available at this time."}
+        bodyFullWidth={
+          bottomPost.content ||
+          bottomPost.body ||
+          "No information available at this time."
+        }
         usernameBottom={bottomPost.author || bottomPost.username || "Anonymous"}
         bountyLabel="Bounty reward"
         bottomBountyScore={bottomPost.score}
@@ -291,7 +348,12 @@ function FrontPage() {
                 optio quia ut, quis ectus quidem pariatur recusandae odio rem?
               </p>
               <div className="advertisement w-full border-2 p-0 mt-1 flex items-center justify-center">
-                <img src="/assets/advert.svg" alt="advertisement for front page" className=" m-0 w-[80%]" />hi
+                <img
+                  src="/assets/advert.svg"
+                  alt="advertisement for front page"
+                  className=" m-0 w-[80%]"
+                />
+                hi
               </div>
             </div>
           </div>
