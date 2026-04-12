@@ -25,7 +25,7 @@ const PROFILE_RULES = [
 export default function WantedProfileFrame({
   profile = null,
   className = "",
-  portraitBackSrc = ASSET.portraitBack, 
+  portraitBackSrc = ASSET.portraitBack,
 }) {
   const data = profile || {
     name: "Kokila Modi",
@@ -35,7 +35,8 @@ export default function WantedProfileFrame({
     languages: ["Hindi", "Gujarati"],
     blood_group: "O+",
     clearance_level: "DEADLY",
-    about: "Lorem ipsum dolor sit amet. Proin ultrices bibendum maximus. In hac habitasse platea dictumst. Nam lacinia scelerisque eleifend.",
+    about:
+      "Lorem ipsum dolor sit amet. Proin ultrices bibendum maximus. In hac habitasse platea dictumst. Nam lacinia scelerisque eleifend.",
     skills: ["Cooking", "Shouting", "Poisonous Fart"],
     photo_url: ASSET.portraitFront,
     username: "kokila_modi",
@@ -43,7 +44,7 @@ export default function WantedProfileFrame({
     registration_number: "MODI-81273",
     connections_count: 100,
     charges_pending: 0,
-    lockup_count: 4
+    lockup_count: 4,
   };
 
   const formatDate = (ds) => {
@@ -51,7 +52,7 @@ export default function WantedProfileFrame({
     try {
       const d = new Date(ds);
       if (isNaN(d.getTime())) return ds;
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
     } catch {
       return ds;
     }
@@ -81,9 +82,12 @@ export default function WantedProfileFrame({
       style={{ width: 736, height: 952 }}
       aria-label="Wanted subject profile"
     >
-      <div 
-        className="absolute inset-0 pointer-events-none opacity-[0.14] mix-blend-multiply z-0" 
-        style={{ backgroundImage: "url('/assets/profileNoise.png')", backgroundSize: "cover" }} 
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.14] mix-blend-multiply z-0"
+        style={{
+          backgroundImage: "url('/assets/profileNoise.png')",
+          backgroundSize: "cover",
+        }}
       />
 
       {/* Rectangle 6 — top band */}
@@ -156,7 +160,13 @@ export default function WantedProfileFrame({
       >
         <h2
           className="z-2 absolute m-0 font-['Arya'] text-[41px] font-bold leading-[1.809] text-white"
-          style={{ left: 10, top: 0, width: 488, height: 62, letterSpacing: "0.03em" }}
+          style={{
+            left: 10,
+            top: 0,
+            width: 488,
+            height: 62,
+            letterSpacing: "0.03em",
+          }}
         >
           SUBJECT PROFILE
         </h2>
@@ -196,55 +206,109 @@ export default function WantedProfileFrame({
         ))}
         <p
           className="absolute m-0 font-['Barlow_Semi_Condensed'] text-[19px] whitespace-nowrap overflow-hidden text-ellipsis font-bold leading-[1.2] text-black flex items-center"
-          style={{ left: 8, top: 0, width: 370, height: 24, letterSpacing: "0.03em" }}
+          style={{
+            left: 8,
+            top: 0,
+            width: 370,
+            height: 24,
+            letterSpacing: "0.03em",
+          }}
         >
           {registrationNumber}
         </p>
         <p
           className="absolute m-0 font-['Barlow_Semi_Condensed'] text-[19px] whitespace-nowrap overflow-hidden text-ellipsis font-bold leading-[1.2] text-black flex items-center"
-          style={{ left: 8, top: 30, width: 370, height: 24, letterSpacing: "0.03em" }}
+          style={{
+            left: 8,
+            top: 30,
+            width: 370,
+            height: 24,
+            letterSpacing: "0.03em",
+          }}
         >
           {name}
         </p>
         <p
           className="absolute m-0 font-['Barlow_Semi_Condensed'] text-[19px] whitespace-nowrap overflow-hidden text-ellipsis font-bold leading-[1.2] text-black flex items-center"
-          style={{ left: 8, top: 60, width: 370, height: 24, letterSpacing: "0.03em" }}
+          style={{
+            left: 8,
+            top: 60,
+            width: 370,
+            height: 24,
+            letterSpacing: "0.03em",
+          }}
         >
           {title}
         </p>
         <p
           className="absolute m-0 font-['Barlow_Semi_Condensed'] text-[19px] whitespace-nowrap overflow-hidden text-ellipsis font-bold leading-[1.2] text-black flex items-center"
-          style={{ left: 8, top: 91, width: 370, height: 24, letterSpacing: "0.03em" }}
+          style={{
+            left: 8,
+            top: 91,
+            width: 370,
+            height: 24,
+            letterSpacing: "0.03em",
+          }}
         >
           {height}
         </p>
         <p
           className="absolute m-0 font-['Barlow_Semi_Condensed'] text-[19px] whitespace-nowrap overflow-hidden text-ellipsis font-bold leading-[1.2] text-black flex items-center"
-          style={{ left: 8, top: 121, width: 370, height: 24, letterSpacing: "0.03em" }}
+          style={{
+            left: 8,
+            top: 121,
+            width: 370,
+            height: 24,
+            letterSpacing: "0.03em",
+          }}
         >
           {weight}
         </p>
         <p
           className="absolute m-0 font-['Barlow_Semi_Condensed'] text-[19px] whitespace-nowrap overflow-hidden text-ellipsis font-bold leading-[1.2] text-black flex items-center"
-          style={{ left: 8, top: 152, width: 370, height: 24, letterSpacing: "0.03em" }}
+          style={{
+            left: 8,
+            top: 152,
+            width: 370,
+            height: 24,
+            letterSpacing: "0.03em",
+          }}
         >
           {languages}
         </p>
         <p
           className="absolute m-0 font-['Barlow_Semi_Condensed'] text-[19px] whitespace-nowrap overflow-hidden text-ellipsis font-bold leading-[1.2] text-black flex items-center"
-          style={{ left: 8, top: 182, width: 370, height: 24, letterSpacing: "0.03em" }}
+          style={{
+            left: 8,
+            top: 182,
+            width: 370,
+            height: 24,
+            letterSpacing: "0.03em",
+          }}
         >
           {connections}
         </p>
         <p
           className="absolute m-0 font-['Barlow_Semi_Condensed'] text-[19px] whitespace-nowrap overflow-hidden text-ellipsis font-bold leading-[1.2] text-black flex items-center"
-          style={{ left: 8, top: 213, width: 370, height: 24, letterSpacing: "0.03em" }}
+          style={{
+            left: 8,
+            top: 213,
+            width: 370,
+            height: 24,
+            letterSpacing: "0.03em",
+          }}
         >
           {chargesPending}
         </p>
         <p
           className="absolute m-0 font-['Barlow_Semi_Condensed'] text-[19px] whitespace-nowrap overflow-hidden text-ellipsis font-bold leading-[1.2] text-black flex items-center"
-          style={{ left: 8, top: 243, width: 370, height: 24, letterSpacing: "0.03em" }}
+          style={{
+            left: 8,
+            top: 243,
+            width: 370,
+            height: 24,
+            letterSpacing: "0.03em",
+          }}
         >
           {lockupCount}
         </p>
@@ -272,13 +336,25 @@ export default function WantedProfileFrame({
 
       <p
         className="absolute z-[6] m-0 font-['Barlow_Semi_Condensed'] text-[19px] font-bold leading-[1.2] text-black"
-        style={{ left: 27, top: 710, width: 110, height: 28, letterSpacing: "0.03em" }}
+        style={{
+          left: 27,
+          top: 710,
+          width: 110,
+          height: 28,
+          letterSpacing: "0.03em",
+        }}
       >
         {aboutHeading}
       </p>
       <p
         className="absolute z-[6] m-0 whitespace-pre-line font-['Copse'] text-[19px] font-normal leading-[1.236] text-black"
-        style={{ left: 27, top: 750, width: 691, height: 229, letterSpacing: "0.03em" }}
+        style={{
+          left: 27,
+          top: 750,
+          width: 691,
+          height: 229,
+          letterSpacing: "0.03em",
+        }}
       >
         {aboutBody}
       </p>
@@ -291,7 +367,13 @@ export default function WantedProfileFrame({
       />
       <h3
         className="absolute z-[6] m-0 font-['Coda_Caption'] text-[19px] font-extrabold leading-[1.579] text-white"
-        style={{ left: 423, top: 591, width: 115, height: 30, letterSpacing: "0.03em" }}
+        style={{
+          left: 423,
+          top: 591,
+          width: 115,
+          height: 30,
+          letterSpacing: "0.03em",
+        }}
       >
         {skillSetTitle}
       </h3>
@@ -305,31 +387,26 @@ export default function WantedProfileFrame({
         style={{ left: 414, top: 732, width: 296 }}
         aria-hidden
       />
-      {skillsList.slice(0, 3).map((label, idx) => {
-        const tops = [633, 667, 700];
-        const textTops = [631, 662, 697];
-        return (
-          <div key={idx}>
-            <div
-              className="absolute z-[6] bg-[#060000]"
-              style={{ left: 422, top: tops[idx], width: 17, height: 17 }}
-              aria-hidden
-            />
-            <p
-              className="absolute z-[6] m-0 font-['Enriqueta'] text-[17px] font-normal leading-[1.338] text-black"
-              style={{
-                left: 446,
-                top: textTops[idx],
-                width: idx === 2 ? 130 : 118,
-                height: 19,
-                letterSpacing: "0.03em",
-              }}
-            >
+      <div
+        className="absolute z-[6] overflow-y-auto pr-2 scrollbar-modern"
+        style={{
+          left: 414,
+          top: 633,
+          width: 296,
+          height: 95,
+          maxHeight: 95, // important
+          pointerEvents:"auto",
+        }}
+      >
+        {skillsList.map((label, idx) => (
+          <div key={idx} className="flex items-center gap-2 mb-2">
+            <div className="w-[17px] h-[17px] bg-[#060000]" />
+            <p className="font-['Enriqueta'] text-[17px] tracking-[0.03em]">
               {label.toUpperCase()}
             </p>
           </div>
-        );
-      })}
+        ))}
+      </div>
 
       <div
         className="absolute z-[6] w-px bg-black"
