@@ -14,9 +14,54 @@ import Network from "./pages/Network";
 import AddPost from "./pages/AddPost";
 import EditProfile from "./pages/EditProfile";
 import HeistDescription from "./pages/HeistDescription";
-import HackNiteCard from './components/HackNiteCard'
-import HackNiteNewspaperPoster from "./components/HackNiteNewspaperPoster";
-import WantedProfileFrame from "./components/WantedProfileFrame";
+import ApprovalInterface from "./components/ApprovalInterface";
+const dummyProfiles = [
+  {
+    id: 1,
+    name: "Marcus 'Ghost' Vance",
+    role: "Infiltration Specialist",
+    skill: "Master",
+    successRate: 98,
+    wantedBy: ["Interpol", "MI6"],
+    bio: "Specializes in biometric evasion and bypassing level-4 physical security."
+  },
+  {
+    id: 2,
+    name: "Elena Rostova",
+    role: "Cyber Operations",
+    skill: "Expert",
+    successRate: 94,
+    wantedBy: ["FBI", "Cyber Command"],
+    bio: "Holds the record for penetrating the Central Bank mainframe in under 4 minutes."
+  },
+  {
+    id: 3,
+    name: "Jin 'The Architect' Kwon",
+    role: "Demolitions / Structural",
+    skill: "Veteran",
+    successRate: 89,
+    wantedBy: ["SIS", "CIA"],
+    bio: "Creator of the shaped-charge micro-implosion technique used in the 2021 Tokyo Vault job."
+  },
+  {
+    id: 4,
+    name: "Sarah 'Wheels' Miller",
+    role: "Extraction/Wheelman",
+    skill: "Elite",
+    successRate: 99,
+    wantedBy: ["Europol", "GIGN"],
+    bio: "Unmatched response time. Has never lost a pursuit, regardless of terrain or opposition."
+  },
+  {
+    id: 5,
+    name: "Alexander Thorne",
+    role: "Social Engineer",
+    skill: "Master",
+    successRate: 96,
+    wantedBy: ["Interpol", "KGB (formerly)"],
+    bio: "Can adopt any persona with 100% conviction. Bypassed the Paris Security summit armed only with a clipboard."
+  }
+];
 const App = () => {
     const location = useLocation();
     const currentPath = location?.pathname || "/";
@@ -50,14 +95,12 @@ const BlackFlash = ({ isNavigating }) => {
           <Route path="/" element={<FrontPageTerminal />} />
           <Route path="/feed" element={<Newspaper />} />
           <Route path="/Heists" element={<HeistsWall />} />
-          <Route path="/working" element={<WantedProfileFrame />} />
-          <Route path="/yugpo" element={<HackNiteCard />} />
           <Route path="/Network" element={<Network />} />
-          <Route path="/hacknite" element={<HackNiteNewspaperPoster />} />
-          <Route path="/wanted" element={<WantedProfileFrame />} />
           <Route path="/add_post" element={<AddPost />} />
           <Route path="/edit_profile" element={<EditProfile />} />
           <Route path="/heist_description/:id" element={<HeistDescription />} />
+          <Route path="/working" element={<ApprovalInterface initialProfiles={dummyProfiles} />} />
+
         </Routes>
       </AnimatePresence>
 

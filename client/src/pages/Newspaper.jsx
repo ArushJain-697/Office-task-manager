@@ -371,19 +371,22 @@ function FrontPage() {
           <div className="w-full h-[0.3em] m-1 font-black block bg-black"></div>
           <div className="w-full h-[0.05em] mt-0 font-black block bg-black"></div>
           <div className="paragraphs h-full w-full flex gap-4 mt-3 flex-col ">
-            <div className=" w-full h-full ">
+            <div className=" w-full h-full flex justify-between flex-col ">
+              <div>
+
               <img
                 src="/assets/test.png"
                 className="newsImage max-w-[45%] float-left mr-4 "
                 alt="test block"
-              />
+                />
               <p className="newsContent text-justify">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
                 numquam quaerat ipsnsectetur adipisicing elit.
                 Aliquam neque tempore cupiditate, asperiores doloribus
-                consequatur ab inventore dolorem it. Tempore, nobis.modi earum
+                co Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.nsequatur ab inventore dolorem it. Tempore, nobis.modi earum
                 optio quia ut, quis ectus quidem pariatur recusandae odio rem?
               </p>
+                </div>
               <div className="advertisement w-full border-2 p-0 mt-1 flex items-center justify-center">
                 <img
                   src="/assets/advert.svg"
