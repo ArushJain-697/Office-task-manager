@@ -100,7 +100,7 @@ stateDiagram-v2
 | Zod validation | req.body validated before controller. Role is strict enum |
 | sanitize-html | All user input stripped before DB insert |
 | helmet + CORS | Express fingerprint hidden, origin whitelisted |
-| Edge Guard | x-edge Cloudflare secret — ready to enable |
+| Edge Guard | x-edge Cloudflare secret |
 
 ---
 
