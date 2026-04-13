@@ -46,22 +46,35 @@ app.use(cookieParser());
 // ==========================================
 // 🛡️ THE SYNDICATE EDGE GUARD (v2 - Timing Safe)
 // ==========================================
-// app.use((req, res, next) => {
-//   if (process.env.NODE_ENV !== "production") return next();
-//   const incomingToken = req.headers['x-edge'];
-//   const expectedToken = process.env.EDGE_SECRET;
-//   if (!incomingToken || !expectedToken) {
-//     return res.status(403).json({ error: "Access Denied. Missing Signature." });
-//   }
-//   try {
-//     const isMatch = crypto.timingSafeEqual(Buffer.from(incomingToken), Buffer.from(expectedToken));
-//     if (!isMatch) throw new Error("Mismatch");
-//   } catch (err) {
-//     console.warn(`🚨 UNAUTHORIZED ORIGIN ATTEMPT: ${req.ip}`);
-//     return res.status(403).json({ error: "Access Denied. Invalid Edge Signature." });
-//   }
-//   next();
-// });
+app.use((req, res, next) => {
+  // Allow OPTIONS requests to pass through so CORS preflight works!
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+
+  if (process.env.NODE_ENV !== "production") return next();
+  const incomingToken = req.headers['x-edge'];
+  const expectedToken = process.env.EDGE_SECRET;
+
+  // Use crypto.timingSafeEqual carefully (length must match or it throws instantly)
+  if (!incomingToken || !expectedToken) {
+    return res.status(403).json({ error: "Access Denied. Missing Signature." });
+  }
+
+  try {
+    const incBuf = Buffer.from(incomingToken, 'utf8');
+    const expBuf = Buffer.from(expectedToken, 'utf8');
+
+    // timingSafeEqual throws if lengths are different
+    if (incBuf.length !== expBuf.length || !crypto.timingSafeEqual(incBuf, expBuf)) {
+      throw new Error("Mismatch");
+    }
+  } catch (err) {
+    console.warn(`🚨 UNAUTHORIZED ORIGIN ATTEMPT: ${req.ip}`);
+    return res.status(403).json({ error: "Access Denied. Invalid Edge Signature." });
+  }
+  next();
+});
 
 app.get("/api", (_req, res) => {
   res.json({ message: "Hello from the backend!" });
