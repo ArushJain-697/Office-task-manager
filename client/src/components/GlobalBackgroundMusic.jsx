@@ -6,18 +6,39 @@ const GlobalBackgroundMusic = ({ src, excludePath }) => {
   const location = useLocation();
 
   useEffect(() => {
-    if (!audioRef.current) return;
+    const audio = audioRef.current;
+    if (!audio) return;
 
-    // Logic: If current path is the excluded one, pause. Otherwise, play.
-    if (location.pathname === excludePath) {
-      audioRef.current.pause();
-    } else {
-      // Browsers may still block this until the first user click
-      audioRef.current.play().catch(() => {
-        console.log("Playback waiting for user interaction...");
-      });
-    }
-  }, [location, excludePath]); // Re-run whenever the URL changes
+    const startAudio = () => {
+      // Only play if we aren't on the excluded route
+      if (location.pathname !== excludePath) {
+        audio.play()
+          .then(() => {
+            // Success! Remove listeners so they don't run again
+            removeListeners();
+          })
+          .catch((err) => {
+            console.log("Playback still blocked:", err);
+          });
+      }
+    };
+
+    const removeListeners = () => {
+      window.removeEventListener('click', startAudio);
+      window.removeEventListener('keydown', startAudio);
+      window.removeEventListener('touchstart', startAudio);
+    };
+
+    // 1. Try playing immediately (works if they navigated here via Link)
+    startAudio();
+
+    // 2. Add listeners for "Cold Starts" (Direct URL entry)
+    window.addEventListener('click', startAudio);
+    window.addEventListener('keydown', startAudio);
+    window.addEventListener('touchstart', startAudio); // Better support for mobile
+
+    return () => removeListeners();
+  }, [location.pathname, excludePath]);
 
   return (
     <audio
