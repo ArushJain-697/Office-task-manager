@@ -8,7 +8,9 @@ const generatePositions = (users, startIndex) => {
   const ww = typeof window !== "undefined" ? window.innerWidth : 1000;
   const cardWidth = 240;
   const spacingY = 480;
-  const maxBoundary = ww - cardWidth - 40;
+  const minBoundary = 56;
+  const maxBoundary = Math.max(minBoundary, ww - cardWidth - 56);
+  const usableWidth = Math.max(0, maxBoundary - minBoundary);
 
   return users.map((user, i) => {
     const id = startIndex + i;
@@ -16,14 +18,18 @@ const generatePositions = (users, startIndex) => {
     let targetX;
 
     if (zone === 0) {
-      targetX = 40 + Math.random() * (ww / 3);
+      targetX = minBoundary + Math.random() * Math.max(1, usableWidth * 0.35);
     } else if (zone === 1) {
-      targetX = (ww * 0.6) + Math.random() * (ww * 0.4 - cardWidth - 40);
+      targetX =
+        minBoundary +
+        usableWidth * 0.6 +
+        Math.random() * Math.max(1, usableWidth * 0.4);
     } else {
-      targetX = ww / 2 - cardWidth / 2 + (Math.random() - 0.5) * 300;
+      targetX =
+        minBoundary + usableWidth * 0.5 - cardWidth / 2 + (Math.random() - 0.5) * 220;
     }
 
-    const x = Math.max(40, Math.min(targetX, maxBoundary));
+    const x = Math.max(minBoundary, Math.min(targetX, maxBoundary));
     const y = id * spacingY + 150 + (Math.random() * 200 - 100);
     const rotation = (Math.random() - 0.5) * 16;
 
@@ -31,7 +37,7 @@ const generatePositions = (users, startIndex) => {
       ...user,
       position: { x, y },
       rotation,
-      pinPos: { x: x + 120, y: y - 10 },
+      pinPos: { x: x + cardWidth / 2, y: y - 10 },
     };
   });
 };
@@ -206,12 +212,14 @@ const MyConnections = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
       ref={scrollContainerRef}
-      className="relative h-screen w-full overflow-y-auto overflow-x-hidden pt-10 border-[24px] border-[#3e2723]"
+      className="relative h-screen w-full overflow-y-auto overflow-x-hidden pt-10 border-[24px] border-[#3e2723] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       style={{
         backgroundColor: "#111",
         backgroundImage: "radial-gradient(circle, #2a2a2a 0%, #000000 100%)",
         backgroundAttachment: "fixed",
         boxShadow: "inset 0 0 100px rgba(0,0,0,0.9)",
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
       }}
     >
       <div className="relative w-full" style={{ height: totalHeightPx }}>

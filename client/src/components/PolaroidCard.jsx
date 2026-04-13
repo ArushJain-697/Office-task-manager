@@ -13,7 +13,7 @@ const PolaroidCard = forwardRef(({ item, index, scrollRef, onCenterInView }, ref
       viewport={{ root: scrollRef, margin: "-20% 0px -20% 0px", once: true }}
       className="absolute bg-[#FAFAF8] p-3 shadow-[0_5px_15px_rgba(0,0,0,0.4)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.6)] cursor-pointer group flex flex-col z-10 border border-gray-200 transition-shadow duration-300"
       style={{
-        left: item.position.x,
+        left: `clamp(56px, ${item.position.x}px, calc(100vw - 296px))`,
         top: item.position.y,
         width: '240px',
       }}
@@ -54,7 +54,6 @@ const PolaroidCard = forwardRef(({ item, index, scrollRef, onCenterInView }, ref
       {/* Tooltip */}
       <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 bg-[#1a1a1a]/95 text-white p-4 rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none w-56 z-50 border border-gray-700">
         <p className="text-sm font-bold text-gray-200 uppercase tracking-widest border-b border-gray-700 pb-2 mb-2">{item.role}</p>
-        <p className="text-xs text-red-400 mb-3 italic font-serif">Connection: {item.connectionReason}</p>
         <div className="flex flex-wrap gap-1.5">
            {item.skills?.map(skill => (
               <span key={skill} className="text-[10px] uppercase font-mono bg-gray-800 text-gray-300 px-2 py-1 rounded-sm border border-gray-600">{skill}</span>

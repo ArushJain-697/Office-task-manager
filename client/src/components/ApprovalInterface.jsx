@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import ProfileCard from './ProfileCard.jsx'
 import '../styles/ApprovalInterface.css';
 
-export default function ApprovalInterface({ initialProfiles }) {
-  const [profiles, setProfiles] = useState(() => 
+export default function ApprovalInterface({ initialProfiles = [], onDecision, onClose }) {
+  const [profiles, setProfiles] = useState(() =>
     initialProfiles.map(p => ({
       ...p,
       // Random rotation between -4 and 4 for the stack effect
@@ -24,6 +24,23 @@ export default function ApprovalInterface({ initialProfiles }) {
   
   const [decisions, setDecisions] = useState({ approve: 0, reject: 0 });
 
+  useEffect(() => {
+    setProfiles(
+      initialProfiles.map((p) => ({
+        ...p,
+        stackRotation: (Math.random() * 8) - 4,
+      })),
+    );
+    setCurrentIndex(0);
+    setIsReviewing(false);
+    setButtonsVisible(false);
+    setIsAnimating(false);
+    setCurrentDecision(null);
+    setStampHit(false);
+    setExiting(null);
+    setDecisions({ approve: 0, reject: 0 });
+  }, [initialProfiles]);
+
   const handleCardClick = (index) => {
     if (index !== currentIndex || isReviewing || isAnimating) return;
     
@@ -42,8 +59,19 @@ export default function ApprovalInterface({ initialProfiles }) {
     }, 500);
   };
 
-  const handleDecision = (decision) => {
+  const handleDecision = async (decision) => {
     if (isAnimating) return;
+    const currentProfile = profiles[currentIndex];
+    const nextStatus = decision === "approve" ? "accepted" : "rejected";
+    if (onDecision && currentProfile?.application_id) {
+      try {
+        await onDecision(currentProfile.application_id, nextStatus);
+      } catch (err) {
+        alert(err?.message || "Failed to update applicant status.");
+        return;
+      }
+    }
+
     setIsAnimating(true);
     setButtonsVisible(false); // Hide buttons instantly or disabled
     
@@ -105,9 +133,15 @@ export default function ApprovalInterface({ initialProfiles }) {
         <div className="completion-screen">
           <h2>Review Complete</h2>
           <p>{decisions.approve} Approved, {decisions.reject} Rejected</p>
-          <button className="btn-reset" onClick={() => window.location.reload()}>
-            Review Again
-          </button>
+          {onClose ? (
+            <button className="btn-reset" onClick={onClose}>
+              Close
+            </button>
+          ) : (
+            <button className="btn-reset" onClick={() => window.location.reload()}>
+              Review Again
+            </button>
+          )}
         </div>
       </div>
     );
