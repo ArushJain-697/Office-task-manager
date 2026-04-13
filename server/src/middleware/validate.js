@@ -1,14 +1,14 @@
 const { z } = require("zod");
 
 const registerCredentialsSchema = z.object({
-  username: z.string().trim().min(3).max(100),
-  password: z.string().min(6).max(128),
+  username: z.string().trim().min(2).max(100),
+  password: z.string().min(2).max(128),
   role: z.enum(["sicario", "fixer"]).default("sicario"),
 });
 
 const loginCredentialsSchema = z.object({
-  username: z.string().trim().min(3).max(100),
-  password: z.string().min(6).max(128),
+  username: z.string().trim().min(2).max(100),
+  password: z.string().min(2).max(128),
   role: z.enum(["sicario", "fixer"]).optional(),
 });
 
@@ -57,14 +57,12 @@ const crewMemberSchema = z.object({
 });
 
 const heistSchema = z.object({
-  // Section A — Mission Overview
   operation_name: z.string().trim().min(3).max(200),
   place: z.string().trim().min(1).max(200),
   target: z.string().trim().min(1).max(200),
   introduction: z.string().trim().min(10).max(3000),
   quote: z.string().trim().max(500).optional().or(z.literal("")),
 
-  // Section B — Reconnaissance
   phase1_name: z.string().trim().min(1).max(200),
   phase1_description: z.string().trim().min(1).max(2000),
   intel_end_points_mapped: z.string().trim().min(1).max(500),
@@ -72,23 +70,18 @@ const heistSchema = z.object({
   intel_surveillance_hours: z.string().trim().min(1).max(500),
   intel_vulnerabilities_found: z.string().trim().min(1).max(500),
 
-  // Section C: Execution
   execution_description: z.string().trim().min(1).max(3000),
-  // Timeline: min 1 step (do not use .length(6) — in Zod 4 that error reads ">=6 items")
   timeline: z
     .array(timelineStepSchema)
     .min(1, { error: "Timeline must include at least one execution step" })
     .max(6, { error: "Timeline cannot exceed 6 execution steps" }),
 
-  // Section D — Extraction
   extraction_plan: z.string().trim().min(1).max(3000),
 
-  // Section E — Crew Manifest
   crew_members: z.array(crewMemberSchema).min(1).max(3),
 });
 
 function validateHeist(req, res, next) {
-  // Parse JSON strings sent via form-data
   ["timeline", "crew_members"].forEach((key) => {
     if (typeof req.body[key] === "string") {
       try {
@@ -131,7 +124,6 @@ function validateProfile(req, res, next) {
       try {
         req.body[key] = JSON.parse(req.body[key]);
       } catch {
-        // ignore
       }
     }
   });
