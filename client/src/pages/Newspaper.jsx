@@ -426,10 +426,10 @@ function FrontPage() {
                   alt="test block"
                 />
                 <p className="newsContent text-justify">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
-                  numquam quaerat ipsnsectetur adipisicing elit. Aliquam neque
-                  tempore cupiobis.modi earum optio quia ut, quis
-                  ectus quidem pariatur recusandae odio rem?
+                  Sin City's shadows grow longer. Three vaults cracked,
+                  two armored transports vanished, and the LVPD has nothing but cold coffee and colder
+                  leads. Hired hands move like ghosts through the neon haze, no names, no faces,
+                  no mercy. The corrupt sleep soundly. Everyone else watches the door.
                 </p>
               </div>
               <div className="advertisement w-full border-2 p-0 mt-1 flex items-center justify-center">
