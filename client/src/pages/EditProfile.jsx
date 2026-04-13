@@ -73,6 +73,7 @@ export default function EditProfile() {
     clearance_level: '', about: '', skills: [], languages: '', photoUrl: null, photoFile: null
   });
 
+  const [profileRole, setProfileRole] = useState(null);
   const [currentFieldId, setCurrentFieldId] = useState('name');
   const [lockState, setLockState] = useState('idle');
   const [carriageOffsetPx, setCarriageOffsetPx] = useState(0);
@@ -86,6 +87,32 @@ export default function EditProfile() {
   const lastKeyEnterRef = useRef(false);
 
   const isMultiline = (id) => ['about'].includes(id);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadRole = async () => {
+      try {
+        const response = await fetch("https://api.sicari.works/api/auth/me", {
+          credentials: "include",
+        });
+        if (!response.ok) return;
+        const authData = await response.json();
+        const role = authData?.user?.role || authData?.data?.user?.role || authData?.role || null;
+        if (isMounted) {
+          setProfileRole(role);
+        }
+      } catch (error) {
+        console.error("Unable to fetch profile role:", error);
+      }
+    };
+
+    loadRole();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const getOrderedFieldList = () => {
     return ['name', 'title', 'height', 'weight', 'blood_group', 'clearance_level', 'skills', 'languages', 'about'];
@@ -255,21 +282,33 @@ export default function EditProfile() {
     }
 
     try {
-      const response = await fetch("https://api.sicari.works/api/sicario/profile", {
+      const activeRole = profileRole === "sicario" || profileRole === "fixer" ? profileRole : null;
+      if (!activeRole) {
+        throw new Error("Unable to determine your account role.");
+      }
+
+      const response = await fetch(`https://api.sicari.works/api/${activeRole}/profile`, {
         method: "PUT",
         credentials: "include",
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error("Failed to edit profile");
+        let errorMessage = "Failed to edit profile";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData?.message || errorData?.error || errorMessage;
+        } catch {
+          // Ignore invalid JSON and use the fallback message.
+        }
+        throw new Error(errorMessage);
       }
 
       // Navigate out sequentially to newspaper/table
       navigate("/feed");
     } catch (e) {
       console.error(e);
-      alert("Error updating profile. Please try again.");
+      alert(e.message || "Error updating profile. Please try again.");
       setLockState('idle');
     }
   };
