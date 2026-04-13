@@ -1,4 +1,61 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useLayoutEffect } from "react";
+
+/** Shared height for portrait + article column (top & bottom stories). */
+const STORY_MEDIA_HEIGHT = "27.5%";
+const STORY_BODY_HEIGHT = "27.5%";
+/** Bottom row (bounty / score / votes / username) — below both story columns */
+const BOTTOM_CONTROLS_TOP = "95.1%";
+
+/**
+ * Single-line username: shrink font (px) until text fits parent width.
+ */
+function UsernameFit({ text }) {
+  const ref = useRef(null);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el?.parentElement) return;
+    const fit = () => {
+      const pw = el.clientWidth || el.parentElement?.clientWidth || 0;
+      if (pw < 4) return;
+      const maxPx = Math.min(26, Math.max(7, pw * 0.14));
+      let lo = 7;
+      let hi = maxPx;
+      let best = maxPx;
+      el.style.whiteSpace = "nowrap";
+      while (hi - lo > 0.35) {
+        const mid = (lo + hi) / 2;
+        el.style.fontSize = `${mid}px`;
+        if (el.scrollWidth <= pw - 1) {
+          best = mid;
+          lo = mid;
+        } else {
+          hi = mid;
+        }
+      }
+      el.style.fontSize = `${best}px`;
+    };
+    fit();
+    const id = requestAnimationFrame(fit);
+    return () => cancelAnimationFrame(id);
+  }, [text]);
+
+  return (
+    <p
+      ref={ref}
+      className="absolute m-0 max-w-full overflow-hidden text-ellipsis p-0 font-['Hermeneus_One'] font-normal leading-none"
+      style={{
+        left: "21.4%",
+        top: "0",
+        width: "78%",
+        fontSize: "5.6cqi",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {text}
+    </p>
+  );
+}
 
 function Upvote({ className, onClick }) {
   return (
@@ -57,7 +114,10 @@ function VoteGroup({ postId, initialVote = 0, onScoreChange }) {
   };
 
   return (
-    <div className="flex items-center gap-[0.5cqi]" onClick={e => e.stopPropagation()}>
+    <div
+      className="flex items-center gap-[0.5cqi] pt-[0.65cqi]"
+      onClick={(e) => e.stopPropagation()}
+    >
       <div style={{ width: "3.3cqi" }}>
         <Upvote 
           onClick={() => handleVote(1)}
@@ -147,7 +207,7 @@ export default function HackNiteNewspaperPoster({
         {/* Lines */}
         <div className="absolute bg-[#040404]" style={{ left: "0", top: "11.78%", height: "46.5%", width: "0.13%" }} />
         <div className="absolute bg-[#040404]" style={{ left: "0", top: "11.03%", height: "0.43%", width: "98.4%" }} />
-        <div className="absolute bg-[#040404]" style={{ left: "43%", top: "11.26%", height: "38.7%", width: "0.13%" }} />
+        <div className="absolute bg-[#040404]" style={{ left: "43%", top: "11.26%", height: "30.2%", width: "0.13%" }} />
 
         {/* Portrait */}
         {portraitSrc ? (
@@ -155,13 +215,13 @@ export default function HackNiteNewspaperPoster({
             src={portraitSrc}
             alt=""
             className="absolute box-border border-[0.15cqi] border-black object-cover select-none"
-            style={{ left: "1.37%", top: "13.1%", width: "40.5%", height: "34%" }}
+            style={{ left: "1.37%", top: "13.1%", width: "40.5%", height: STORY_MEDIA_HEIGHT }}
             draggable={false}
           />
         ) : (
           <div
             className="absolute box-border flex items-center justify-center border-[0.1cqi] border-black bg-neutral-200/80 text-neutral-600"
-            style={{ left: "1.37%", top: "13.1%", width: "40.5%", height: "34%", fontSize: "1.8cqi" }}
+            style={{ left: "1.37%", top: "13.1%", width: "40.5%", height: STORY_MEDIA_HEIGHT, fontSize: "1.8cqi" }}
             aria-hidden
           >
             Portrait
@@ -169,8 +229,8 @@ export default function HackNiteNewspaperPoster({
         )}
 
         <p
-          className="absolute m-0 max-w-none whitespace-pre-wrap p-0 font-['Fahkwang'] font-normal text-black"
-          style={{ left: "44%", top: "11.95%", width: "51.6%", height: "33.2%", fontSize: "2.6cqi", lineHeight: "1.35" }}
+          className="absolute m-0 max-w-none overflow-hidden whitespace-pre-wrap p-0 font-['Fahkwang'] font-normal text-black"
+          style={{ left: "44%", top: "13.1%", width: "51.6%", height: STORY_BODY_HEIGHT, fontSize: "2.6cqi", lineHeight: "1.35" }}
         >
           {bodyColumn}
         </p>
@@ -178,14 +238,9 @@ export default function HackNiteNewspaperPoster({
         <div className="absolute bg-black" style={{ left: "0", top: "50%", height: "0.11%", width: "43%" }} />
 
         {/* Username + rule */}
-        <div className="absolute text-[#010202]" style={{ left: "63.6%", top: "52.8%", width: "35%", height: "3.1%" }}>
+        <div className="absolute text-[#010202]" style={{ left: "63.6%", top: "52.8%", width: "35%", height: "4.2%" }}>
           <div className="absolute bg-[#130802]" style={{ left: "0", top: "74%", height: "14%", width: "15%" }} />
-          <p
-            className="absolute m-0 p-0 font-['Hermeneus_One'] font-normal"
-            style={{ left: "21.4%", top: "0", width: "78%", fontSize: "5.6cqi", lineHeight: "0.64" }}
-          >
-            {usernameTop}
-          </p>
+          <UsernameFit text={usernameTop} />
         </div>
 
         <p
@@ -207,11 +262,11 @@ export default function HackNiteNewspaperPoster({
           </p>
         </div>
 
-        <div className="absolute" style={{ left: "41.2%", top: "53%" }}>
-          <VoteGroup 
-            postId={topPostId} 
-            initialVote={topPostUserVote} 
-            onScoreChange={(delta) => setTopScore(prev => prev + delta)}
+        <div className="absolute" style={{ left: "41.2%", top: "52.55%" }}>
+          <VoteGroup
+            postId={topPostId}
+            initialVote={topPostUserVote}
+            onScoreChange={(delta) => setTopScore((prev) => prev + delta)}
           />
         </div>
 
@@ -226,59 +281,54 @@ export default function HackNiteNewspaperPoster({
         </h2>
 
         <div className="absolute bg-[#040404]" style={{ left: "0.4%", top: "64.4%", height: "0.11%", width: "97.4%" }} />
-        <div className="absolute bg-[#040404]" style={{ left: "0.2%", top: "58.6%", height: "40.7%", width: "0.13%" }} />
+        <div className="absolute bg-[#040404]" style={{ left: "0.2%", top: "58.6%", height: "36.8%", width: "0.13%" }} />
 
-        {/* Bottom Portrait — mirrors top section */}
+        {/* Bottom Portrait — same media height as top */}
         {bottomPortraitSrc ? (
           <img
             src={bottomPortraitSrc}
             alt=""
             className="absolute box-border border-[0.15cqi] border-black object-cover select-none"
-            style={{ left: "1.37%", top: "66.7%", width: "40.5%", height: "23%" }}
+            style={{ left: "1.37%", top: "66.7%", width: "40.5%", height: STORY_MEDIA_HEIGHT }}
             draggable={false}
           />
         ) : null}
 
         {/* Bottom divider line — only shown when image is present, mirrors top */}
         {bottomPortraitSrc && (
-          <div className="absolute bg-[#040404]" style={{ left: "43%", top: "64.7%", height: "25.5%", width: "0.13%" }} />
+          <div className="absolute bg-[#040404]" style={{ left: "43%", top: "64.7%", height: "30.2%", width: "0.13%" }} />
         )}
 
         <p
-          className="absolute m-0 max-w-none whitespace-pre-wrap p-0 font-['Fahkwang'] font-normal text-black"
+          className="absolute m-0 max-w-none overflow-hidden whitespace-pre-wrap p-0 font-['Fahkwang'] font-normal text-black"
           style={{
             left: bottomPortraitSrc ? "44%" : "1.7%",
             top: "66.7%",
             width: bottomPortraitSrc ? "51.6%" : "96.3%",
-            height: "23%",
+            height: STORY_BODY_HEIGHT,
             fontSize: "2.6cqi",
-            lineHeight: "1.35"
+            lineHeight: "1.35",
           }}
         >
           {bodyFullWidth}
         </p>
 
-        {/* Group 18 */}
-        <div className="absolute text-[#010202]" style={{ left: "63.6%", top: "91.9%", width: "35%", height: "3.1%" }}>
+        {/* Lower story — bounty / score / vote / username (one band below body; gap above) */}
+        <div className="absolute text-[#010202]" style={{ left: "63.6%", top: BOTTOM_CONTROLS_TOP, width: "35%", height: "4%" }}>
           <div className="absolute bg-[#130802]" style={{ left: "0", top: "74%", height: "14%", width: "15%" }} />
-          <p
-            className="absolute m-0 p-0 font-['Hermeneus_One'] font-normal"
-            style={{ left: "21.4%", top: "0", width: "78%", fontSize: "5.6cqi", lineHeight: "0.64" }}
-          >
-            {usernameBottom}
-          </p>
+          <UsernameFit text={usernameBottom} />
         </div>
 
         <p
           className="absolute m-0 p-0 font-['Koulen'] font-normal text-[#050200]"
-          style={{ left: "1.5%", top: "91.7%", width: "20.4%", fontSize: "3.3cqi", lineHeight: "1.08" }}
+          style={{ left: "1.5%", top: BOTTOM_CONTROLS_TOP, width: "20.4%", fontSize: "3.3cqi", lineHeight: "1.08" }}
         >
           {bountyLabel}
         </p>
 
         <div
           className="absolute box-border border-[0.25cqi] border-black bg-transparent flex items-center justify-center"
-          style={{ left: "22.5%", top: "90.9%", width: "17%", height: "4.2%" }}
+          style={{ left: "22.5%", top: BOTTOM_CONTROLS_TOP, width: "17%", height: "3.8%" }}
         >
           <p
             className="m-0 p-0 font-['Fredericka_the_Great'] font-normal text-black"
@@ -288,11 +338,11 @@ export default function HackNiteNewspaperPoster({
           </p>
         </div>
 
-        <div className="absolute" style={{ left: "41.2%", top: "91.5%" }}>
-          <VoteGroup 
-            postId={bottomPostId} 
-            initialVote={bottomPostUserVote} 
-            onScoreChange={(delta) => setBottomScore(prev => prev + delta)}
+        <div className="absolute" style={{ left: "41.2%", top: BOTTOM_CONTROLS_TOP }}>
+          <VoteGroup
+            postId={bottomPostId}
+            initialVote={bottomPostUserVote}
+            onScoreChange={(delta) => setBottomScore((prev) => prev + delta)}
           />
         </div>
 
