@@ -3,20 +3,17 @@ const cors = require("cors");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const crypto = require("crypto");
+const swaggerUi = require("swagger-ui-express");
 
 const authRoutes = require("./routes/authRoutes");
-const postRoutes = require("./routes/postRoutes");
-const sicarioRoutes = require("./routes/sicarioRoutes");
-const fixerRoutes = require("./routes/fixerRoutes");
-const connectionRoutes = require("./routes/connectionRoutes");
+const taskRoutes = require("./routes/taskRoutes");
 const userRoutes = require("./routes/userRoutes");
+const { swaggerSpec } = require("./swagger");
 
 const app = express();
 
 const allowedOrigins = [
-  process.env.FRONTEND_URL || "https://sicari.works",
-  "https://sicari.works",
-  "https://www.sicari.works",
+  process.env.FRONTEND_URL,
   "http://localhost:5173",
 ].filter(Boolean);
 
@@ -43,9 +40,7 @@ app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 
-// ==========================================
-// 🛡️ THE SYNDICATE EDGE GUARD (v2 - Timing Safe)
-// ==========================================
+// Production-only request signature guard (timing-safe compare)
 app.use((req, res, next) => {
   // Allow OPTIONS requests to pass through so CORS preflight works!
   if (req.method === 'OPTIONS') {
@@ -58,7 +53,7 @@ app.use((req, res, next) => {
 
   // Use crypto.timingSafeEqual carefully (length must match or it throws instantly)
   if (!incomingToken || !expectedToken) {
-    return res.status(403).json({ error: "Access Denied. Missing Signature." });
+    return res.status(403).json({ error: "Access denied. Missing signature." });
   }
 
   try {
@@ -70,25 +65,23 @@ app.use((req, res, next) => {
       throw new Error("Mismatch");
     }
   } catch (err) {
-    console.warn(`🚨 UNAUTHORIZED ORIGIN ATTEMPT: ${req.ip}`);
-    return res.status(403).json({ error: "Access Denied. Invalid Edge Signature." });
+    console.warn(`Unauthorized signature attempt: ${req.ip}`);
+    return res.status(403).json({ error: "Access denied. Invalid signature." });
   }
   next();
 });
 
-app.get("/api", (_req, res) => {
-  res.json({ message: "Hello from the backend!" });
+app.get("/api/v1", (_req, res) => {
+  res.json({ message: "Office Task Manager API v1" });
 });
 
-const apiRouter = express.Router();
-apiRouter.use("/auth", authRoutes);
-apiRouter.use("/posts", postRoutes);
-apiRouter.use("/sicario", sicarioRoutes);
-apiRouter.use("/fixer", fixerRoutes);
-apiRouter.use("/connections", connectionRoutes);
-apiRouter.use("/profile", userRoutes);
+const apiV1Router = express.Router();
+apiV1Router.use("/auth", authRoutes);
+apiV1Router.use("/tasks", taskRoutes);
+apiV1Router.use("/users", userRoutes);
+apiV1Router.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use("/api", apiRouter);
+app.use("/api/v1", apiV1Router);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Endpoint not found. Please check the API documentation." });

@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { pool } = require("../db");
+const { sanitizeObject } = require("../utils/sanitize");
 
 const cookieOptions = {
   httpOnly: true,
@@ -23,34 +24,21 @@ function signToken(user) {
   );
 }
 
-exports.checkUser = async (req, res) => {
-  try {
-    const { username } = req.body;
-    if (!username) return res.status(400).json({ message: "Username is required." });
-
-    const [rows] = await pool.query("SELECT id FROM users WHERE username = ? LIMIT 1", [username]);
-    if (rows.length === 0) return res.status(404).json({ message: "No such goon exists." });
-
-    return res.json({ exists: true });
-  } catch (error) {
-    return internalError(res, "Internal server error", error);
-  }
-};
-
 exports.register = async (req, res) => {
   try {
-    const { username, password, role } = req.body;
-    const [existingRows] = await pool.query("SELECT id FROM users WHERE username = ? LIMIT 1", [username]);
+    const { username, password } = sanitizeObject(req.body);
+    const [existingRows] = await pool.query("SELECT id FROM users WHERE username = ? LIMIT 1", [
+      username,
+    ]);
     if (existingRows.length > 0) return res.status(409).json({ message: "Username already in use" });
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const derivedEmail = `${username}@sicari.local`;
     const [insertResult] = await pool.query(
-      "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)",
-      [username, derivedEmail, passwordHash, role]
+      "INSERT INTO users (username, password, role) VALUES (?, ?, 'user')",
+      [username, passwordHash]
     );
 
-    const user = { id: insertResult.insertId, username, role };
+    const user = { id: insertResult.insertId, username, role: "user" };
     const token = signToken(user);
 
     res.cookie("jwt", token, cookieOptions);
@@ -62,7 +50,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { username, password, role } = req.body;
+    const { username, password } = sanitizeObject(req.body);
     const [rows] = await pool.query(
       "SELECT id, username, password, role FROM users WHERE username = ? LIMIT 1",
       [username]
@@ -70,10 +58,6 @@ exports.login = async (req, res) => {
 
     const user = rows[0];
     if (!user) return res.status(401).json({ message: "Invalid username or password" });
-
-    if (role && role !== user.role) {
-      return res.status(401).json({ message: "Invalid role for this username" });
-    }
 
     const storedPassword = user.password || "";
     const isBcryptHash =
@@ -112,16 +96,7 @@ exports.logout = (req, res) => {
   return res.json({ message: "Logged out successfully" });
 };
 
-exports.getUsers = async (_req, res) => {
-  try {
-    const [rows] = await pool.query("SELECT id, username, role, created_at FROM users ORDER BY id DESC");
-    return res.json(rows);
-  } catch (error) {
-    return internalError(res, "Internal server error", error);
-  }
-};
-
-exports.getMe = async (req, res) => {
+exports.me = async (req, res) => {
   try {
     const [rows] = await pool.query(
       "SELECT id, username, role, created_at FROM users WHERE id = ? LIMIT 1",

@@ -1,8 +1,0 @@
-/* Modal: keep 381×507 card + VIEW button inside the viewport (no off-screen absolute) */
-.heist-wall-modal-card {
-  transform-origin: center center;
-  transform: scale(
-    min(1, min((100vw - 32px) / 381, (100dvh - 280px) / 507))
-  );
-  will-change: transform;
-}

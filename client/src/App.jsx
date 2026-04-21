@@ -1,120 +1,72 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
-//import pages :
-import FrontPageTerminal from "./pages/FrontPageTerminal";
-import Newspaper from "./pages/Newspaper";
-import { motion, AnimatePresence } from 'framer-motion';
-import HeistsWall from "./pages/HeistsWall";
-import Network from "./pages/Network";
-import AddPost from "./pages/AddPost";
-import AddHeist from "./pages/AddHeist";
-import EditProfile from "./pages/EditProfile";
-import HeistDescription from "./pages/HeistDescription";
-import MyHeists from "./pages/My_Heists";
-import MyConnections from "./pages/MyConnections";
-import FindConnections from "./pages/FindConnections";
-import ConnectionRequests from "./pages/ConnectionRequests";
-const dummyProfiles = [
-  {
-    id: 1,
-    name: "Marcus 'Ghost' Vance",
-    role: "Infiltration Specialist",
-    skill: "Master",
-    successRate: 98,
-    wantedBy: ["Interpol", "MI6"],
-    bio: "Specializes in biometric evasion and bypassing level-4 physical security."
-  },
-  {
-    id: 2,
-    name: "Elena Rostova",
-    role: "Cyber Operations",
-    skill: "Expert",
-    successRate: 94,
-    wantedBy: ["FBI", "Cyber Command"],
-    bio: "Holds the record for penetrating the Central Bank mainframe in under 4 minutes."
-  },
-  {
-    id: 3,
-    name: "Jin 'The Architect' Kwon",
-    role: "Demolitions / Structural",
-    skill: "Veteran",
-    successRate: 89,
-    wantedBy: ["SIS", "CIA"],
-    bio: "Creator of the shaped-charge micro-implosion technique used in the 2021 Tokyo Vault job."
-  },
-  {
-    id: 4,
-    name: "Sarah 'Wheels' Miller",
-    role: "Extraction/Wheelman",
-    skill: "Elite",
-    successRate: 99,
-    wantedBy: ["Europol", "GIGN"],
-    bio: "Unmatched response time. Has never lost a pursuit, regardless of terrain or opposition."
-  },
-  {
-    id: 5,
-    name: "Alexander Thorne",
-    role: "Social Engineer",
-    skill: "Master",
-    successRate: 96,
-    wantedBy: ["Interpol", "KGB (formerly)"],
-    bio: "Can adopt any persona with 100% conviction. Bypassed the Paris Security summit armed only with a clipboard."
-  }
-];
-const App = () => {
-    const location = useLocation();
-    const currentPath = location?.pathname || "/";
+import { Navigate, Route, Routes } from "react-router-dom";
 
-const BlackFlash = ({ isNavigating }) => {
+import { useAuth } from "./context/AuthContext";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import AdminDashboard from "./pages/AdminDashboard";
+import UserDashboard from "./pages/UserDashboard";
+
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+}
+
+function RoleRoute({ role, children }) {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role !== role) return <Navigate to="/" replace />;
+  return children;
+}
+
+export default function App() {
+  const { user, loading } = useAuth();
+
+  const home = () => {
+    if (loading) return null;
+    if (!user) return <Navigate to="/login" replace />;
+    return user.role === "admin" ? (
+      <Navigate to="/admin" replace />
+    ) : (
+      <Navigate to="/dashboard" replace />
+    );
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ 
-        opacity: [0, 1, 1, 0], // Flash black in the middle
-      }}
-      transition={{
-        duration: 2.2, // Total time covers Exit (1s) + Gap + Entry (1.2s)
-        times: [0, 0.4, 0.6, 1], 
-        ease: "easeInOut"
-      }}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'black',
-        zIndex: 99,
-        pointerEvents: 'none'
-      }}
-    />
-  );
-};
-  return (
-    <div className="min-h-screen bg-black"> 
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<FrontPageTerminal />} />
-          <Route path="/feed" element={<Newspaper />} />
-          <Route path="/Heists" element={<HeistsWall />} />
-          <Route path="/Network" element={<Network />} />
-          <Route path="/connections" element={<MyConnections />} />
-          <Route path="/find_connections" element={<FindConnections />} />
-          <Route path="/connection_requests" element={<ConnectionRequests />} />
-          <Route path="/add_post" element={<AddPost />} />
-          <Route path="/add_heist" element={<AddHeist />} />
-          <Route path="/edit_profile" element={<EditProfile />} />
-          <Route path="/my_heists" element={<MyHeists />} />
-          <Route path="/heistsDesc" element={<HeistDescription />} />
-          <Route path="/heist/:id" element={<HeistDescription />} />
-        </Routes>
-      </AnimatePresence>
+    <Routes>
+      <Route path="/" element={home()} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
-      {/* <Transition key={location.pathname} /> */}
-    </div>
-  );
-};
+      <Route
+        path="/admin"
+        element={
+          <RoleRoute role="admin">
+            <AdminDashboard />
+          </RoleRoute>
+        }
+      />
 
-export default App;
+      <Route
+        path="/dashboard"
+        element={
+          <RoleRoute role="user">
+            <UserDashboard />
+          </RoleRoute>
+        }
+      />
+
+      <Route
+        path="*"
+        element={
+          <ProtectedRoute>
+            <Navigate to="/" replace />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+}
