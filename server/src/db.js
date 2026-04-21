@@ -1,12 +1,31 @@
 const mysql = require("mysql2/promise");
 const bcrypt = require("bcrypt");
 
+function parseBool(value) {
+  if (value == null) return false;
+  const v = String(value).trim().toLowerCase();
+  return v === "1" || v === "true" || v === "yes" || v === "on";
+}
+
+const mysqlSslEnabled =
+  parseBool(process.env.MYSQL_SSL) ||
+  parseBool(process.env.MYSQL_SSL_ENABLED) ||
+  parseBool(process.env.MYSQL_TLS) ||
+  parseBool(process.env.AIVEN_SSL);
+
 const pool = mysql.createPool({
   host: process.env.MYSQLHOST,
   port: Number(process.env.MYSQLPORT || 3306),
   user: process.env.MYSQLUSER,
   password: process.env.MYSQLPASSWORD,
   database: process.env.MYSQLDATABASE,
+  ...(mysqlSslEnabled
+    ? {
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      }
+    : {}),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
